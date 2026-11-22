@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body style="margin:0">
+<title>אדי × טרייד מוביל</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>document.documentElement.dir = 'rtl'; document.documentElement.lang = 'he';</script>
+<style>
+  /* Single light look by choice (product catalog shown to customers) */
+  :root { --bg: #ffffff; --fg: #171717; color-scheme: light; }
+  body { background: var(--bg); color: var(--fg); font-family: 'Heebo', 'Segoe UI', Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+  /* Kia tile behaviour: photo zooms, overlay lightens on hover */
+  .tile .media { transition: transform .5s ease-out; }
+  .tile:hover .media { transform: scale(1.08); }
+  .tile .shade { transition: opacity .5s ease-out; }
+  .tile:hover .shade { opacity: .55; }
+  @keyframes rise { from { transform: translateY(14px) } to { transform: none } }
+  .rise { animation: rise .7s ease-out both; }
+  #drawer { transition: transform .3s ease; }
+  .site-header { top: env(safe-area-inset-top, 0px); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: #fff; }
+  @media (prefers-reduced-motion: reduce) { .rise { animation: none } .tile .media { transition: none } }
+  *:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+</style>
+
+<!-- Header: hamburger + ADI × Trade Mobile -->
+<header class="site-header sticky z-30 w-full border-b border-neutral-100 bg-white/95 backdrop-blur">
+  <div class="relative flex items-center justify-center px-4 py-3 sm:py-4">
+    <button id="menuBtn" class="absolute right-3 flex h-11 w-11 items-center justify-center rounded-xl hover:bg-neutral-100 sm:right-6" aria-label="תפריט">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-6 w-6"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <a href="#home" class="flex items-center gap-4 sm:gap-8">
+      <img src="images/adi-logo.png" alt="אדי מערכות לרכב" class="h-9 w-auto sm:h-12">
+      <span class="text-xl font-light text-neutral-300 sm:text-2xl">×</span>
+      <img src="images/Trade%20Mobile%20Hebrew%20logo%20cutout%20(1).png" alt="טרייד מוביל" class="h-10 w-auto sm:h-14">
+
+    </a>
+  </div>
+</header>
+
+<!-- Hamburger drawer -->
+<div id="scrim" class="fixed inset-0 z-40 hidden bg-black/40"></div>
+<nav id="drawer" class="fixed inset-y-0 right-0 z-50 flex w-80 max-w-[85vw] translate-x-full flex-col bg-white shadow-2xl" aria-label="תפריט" style="padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)">
+  <div class="flex items-center justify-between border-b border-neutral-100 px-5 py-4">
+    <span class="text-lg font-extrabold">תפריט</span>
+    <button id="menuClose" class="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-lg hover:bg-neutral-200" aria-label="סגירה">✕</button>
+  </div>
+  <div id="menuList" class="flex-1 overflow-y-auto p-3"></div>
+</nav>
+
+<div id="app"></div>
+
+<!-- Product-sheet viewer -->
+<div id="sheet" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 p-3 sm:p-6">
+  <div class="relative flex h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white">
+    <div class="flex items-center justify-between gap-3 border-b border-neutral-100 px-4 py-3">
+      <span id="sheetTitle" class="min-w-0 truncate font-bold"></span>
+      <div class="flex shrink-0 items-center gap-2">
+        <a id="sheetLink" target="_blank" rel="noopener" class="hidden rounded-full bg-neutral-100 px-4 py-2 text-sm font-medium hover:bg-neutral-200 sm:inline-block">פתיחה בחלון חדש ↗</a>
+        <button id="sheetClose" class="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-xl hover:bg-neutral-200" aria-label="סגירה">✕</button>
+      </div>
+    </div>
+    <div id="sheetBody" class="flex-1 overflow-y-auto bg-neutral-100"></div>
+  </div>
+</div>
+
+<script>
+const ICON = {
+  camera:  '<path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
+  screen:  '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  shield:  '<path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+  pin:     '<path d="M20 10c0 5-5.5 10.2-7.4 11.8a1 1 0 0 1-1.2 0C9.5 20.2 4 15 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  sparkle: '<path d="M9.9 15.5A2 2 0 0 0 8.5 14.1L2.4 12.5a.5.5 0 0 1 0-1l6.1-1.6a2 2 0 0 0 1.4-1.4l1.6-6.1a.5.5 0 0 1 1 0l1.6 6.1a2 2 0 0 0 1.4 1.4l6.1 1.6a.5.5 0 0 1 0 1l-6.1 1.6a2 2 0 0 0-1.4 1.4l-1.6 6.1a.5.5 0 0 1-1 0z"/><path d="M20 3v4M22 5h-4"/>',
+  speaker: '<rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="14" r="4"/><path d="M12 6h.01"/>',
+  baby:    '<path d="M9 12h.01M15 12h.01M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"/>',
+  wind:    '<path d="M12.8 19.6A2 2 0 1 0 14 16H2M17.5 8a2.5 2.5 0 1 1 2 4H2M9.8 4.4A2 2 0 1 1 11 8H2"/>',
+  gauge:   '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
+  phone:   '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
+  bolt:    '<path d="M4 14a1 1 0 0 1-.8-1.6l9.9-10.2a.5.5 0 0 1 .9.5l-1.9 6A1 1 0 0 0 13 10h7a1 1 0 0 1 .8 1.6l-9.9 10.2a.5.5 0 0 1-.9-.5l1.9-6A1 1 0 0 0 11 14z"/>',
+  file:    '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/>',
+  users:   '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  home:    '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+};
+const svg = (k, cls, sw = 1.75) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" class="${cls}">${ICON[k]}</svg>`;
+
+const S = 'sheets/';
+// Web-size copies (max 1600px, JPG) live in images/web/ with the same base name
+const KIT_TRUNK = 'kit-trunk.png'; // AI-generated empty trunk (Figma), products are overlaid as real photos
+const I = name => /\.(webp|avif)$/i.test(name)
+  ? 'images/' + encodeURIComponent(name)
+  : 'images/web/' + encodeURIComponent(name.replace(/\.[^.]+$/, '') + '.jpg');
+const JBL_MOOD = 'Bass-pro-go_-uitgelichte-afbeelding-1024x576.jpg.webp';
+
+// Product photos Lior added (first = main photo on the product page, tile = photo on the home tile)
+const partPhotos = ['BCARE!.jpg', 'car-vacuum-hl-109b.jpg', 'HL-010 קומפרסור 1.png', 'C22-wireless-phone-charging-pad-for-cars-min-600x600.jpg', 'בוסטר התנעה לרכב-01.png'];
+// tile: photo on the home tile (null = collage of the kit's products). TODO: lifestyle photos for kit / Achilles / JBL, sharper nano photo
+const photos = {
+  q200:     { tile: 'Q200 רכב 01.jpg', gallery: ['Q200 רכב 01.jpg', 'Q200 רכב 03.png', 'תמונות מוצר Q200-03.jpg'] },
+  screens:  { tile: 'מסכים אחוריים אווירה 07012022.jpg', gallery: ['מסכים אחוריים אווירה 07012022.jpg', 'TABY+-01.png', 'TABY+ 2.png', 'מסך אנדרואיד למשענת הראש.png', 'Adi-Go-Kids (7).JPG'] },
+  bcare:    { tile: null, gallery: ['BCARE.jpg', 'BCARE!.jpg'] },
+  achilles: { tile: 'achilles-mood.jpg', gallery: ['achilles-mood.jpg', 'מערכת איתור.png'] },
+  polish:   { tile: 'ננו.jpg', gallery: ['ננו.jpg'], cover: true },
+  jbl:      { tile: JBL_MOOD, gallery: [JBL_MOOD, 'JBL_Basspro_Go_904x560_LS1.avif', 'BASSPRO GO.png'] },
+};
+// Tile order sets tile size (Kia grid): wide, tall, normal, normal, wide, normal — big tiles get the sharpest photos
+const tileOrder = ['q200', 'screens', 'bcare', 'polish', 'achilles', 'jbl'];
+
+// ───── The 6 benefit items (names + prices from the Trade Mobile email/list; text from the product sheets) ─────
+const items = [
+  { slug: 'q200', icon: 'camera', soft: '#e0f2fe', ink: '#0369a1',
+    title: 'מצלמת דרך קדמית + אחורית Q200', price: 1540, sheet: S + 'q200.pdf',
+    lead: 'מצלמת דרך דו כיוונית לתיעוד והקלטה של אירועים במהלך נסיעה',
+    points: ['מצלמה קדמית 2K ואחורית Full HD', 'מתעדת גם כשהרכב עומד בחניה', 'צפייה באפליקציה בעברית'] },
+
+  { slug: 'screens', icon: 'screen', soft: '#f3e8ff', ink: '#7e22ce',
+    title: 'זוג מסכי אנדרואיד אחוריים', price: 3800, sheet: S + 'taby-plus.pdf',
+    lead: 'מסכי מולטימדיה לנוסעים במושב האחורי, לצפייה בסרטונים ולשימוש באפליקציות',
+    points: ['זוג מסכי אנדרואיד אחוריים', 'דונגל WIFI', 'חבילת גלישה 12G או 12 חודשים (המוקדם מביניהם)', 'זוג אוזניות אלחוטיות'] },
+
+  { slug: 'bcare', icon: 'shield', soft: '#dcfce7', ink: '#15803d',
+    title: 'ערכת בטיחות ונוחות', price: 1780,
+    lead: 'מערכת BCARE נגד שכחת ילדים ועוד 4 אביזרים שימושיים לרכב',
+    parts: [
+      { icon: 'baby',  name: 'מערכת התראה נגד שכחת ילדים BCARE', line: 'כרית על כיסא הבטיחות שולחת התראה לנייד אם הילד נשאר ברכב', sheet: S + 'bcare.pdf' },
+      { icon: 'wind',  name: 'שואב אבק נטען נייד לרכב',          line: 'שואב קטן ונטען, עם מסנן HEPA',                           sheet: S + 'vacuum-hl109b.pdf' },
+      { icon: 'gauge', name: 'קומפרסור נטען נייד',                line: 'ניפוח מהיר של צמיגי הרכב, נטען ב-USB',                     sheet: S + 'compressor-hl010.pdf' },
+      { icon: 'phone', name: 'מעמד לטלפון עם טעינה אלחוטית',      line: 'מחזיק את הטלפון ומטעין אותו בזמן הנסיעה',                  sheet: S + 'holder-c22.pdf' },
+      { icon: 'bolt',  name: 'בוסטר לרכב',                         line: 'מתניע את הרכב כשהמצבר ריק, כולל פנס',                      sheet: S + 'booster.pdf' },
+    ] },
+
+  { slug: 'achilles', icon: 'pin', soft: '#ffedd5', ink: '#c2410c',
+    title: 'מערכת איתור פעילה – אקילס', price: 1990, sheet: S + 'warrior-pro-private-car.pdf',
+    lead: 'מערכת איתור פעילה הכוללת לוח מקשים, מתאימה להתקנה ברכב פרטי',
+    points: ['איתור ומעקב GPS ברשת 4G, עם ממסר ניתוק', 'מוקד אכיפה 24/7 כולל סיירים בשטח', 'אפליקציה לאיתור ומעקב בזמן אמת'],
+    small: 'לא כולל דמי מנוי',
+    repNote: 'יש לבדוק עם הלקוח לפני דרישת מיגון' },
+
+  { slug: 'polish', icon: 'sparkle', soft: '#cffafe', ink: '#0e7490',
+    title: 'פוליש + ננו לרכב', price: 3500, sheet: S + 'detailing.pdf',
+    lead: 'ציפוי ננו קרמי שיוצר שכבת הגנה שקופה על הלכה ושומר על הברק של הרכב',
+    points: ['הגנת UV מלאה', 'אפקט הידרופובי – המים מחליקים מהרכב', 'ניקיון בקלות'] },
+
+  { slug: 'jbl', icon: 'speaker', soft: '#ffe4e6', ink: '#be123c',
+    title: 'סאב וופר נשלף JBL BassPro Go', price: 3080, sheet: S + 'jbl-basspro-go.pdf',
+    lead: 'סאב־וופר לרכב שנשלף והופך לרמקול בלוטות׳ נייד',
+    points: ['סאב־וופר 8 אינץ׳ עם מגבר 200W', 'עמיד במים, סוללה עד 6 שעות', 'מתאים גם לתא מטען קטן'] },
+];
+
+// Commissions (rep / manager) and installation place — from the Trade Mobile table & email
+// ───── מק״טים (מהספק) — למלא בין המירכאות. מק״ט ריק לא מוצג באתר ─────
+const SKUS = {
+  q200:     '',   // מצלמת דרך Q200
+  screens:  '',   // זוג מסכי אנדרואיד אחוריים
+  bcare:    '',   // ערכת בטיחות ונוחות (מק״ט הערכה כולה)
+  achilles: '',   // מערכת איתור אקילס
+  polish:   '',   // פוליש + ננו
+  jbl:      '',   // JBL BassPro Go
+  // המוצרים בתוך ערכת בטיחות ונוחות:
+  'bcare-1': '',  // BCARE
+  'bcare-2': '',  // שואב אבק
+  'bcare-3': '',  // קומפרסור
+  'bcare-4': '',  // מעמד טלפון C22
+  'bcare-5': '',  // בוסטר
+};
+
+const commissions = { q200: [100, 50], screens: [150, 50], bcare: [100, 50], achilles: [150, 50], polish: [150, 50], jbl: [100, 50] };
+const INSTALL_ALL = 'כלל ההתקנות והשירותים מתבצעים בא.ד.י מערכות (רח׳ אליהו איתן 1, ראשון לציון), בתחנות התקנה / תחנות דיטיילינג (בהתאם למוצר), או בבית הלקוח בתיאום מראש מול אדי מערכות.';
+const install = { polish: 'בתחנות הדיטיילינג', jbl: 'בתחנות ההתקנה' };
+const installDefault = 'בא.ד.י מערכות בראשון לציון, בתחנות התקנה, או בבית הלקוח בתיאום מראש';
+
+const fmt = n => '₪' + n.toLocaleString('he-IL');
+const star = '<span class="text-amber-400">★</span>';
+const backLink = `<a href="#home" class="mb-4 inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200">→ חזרה לכל המוצרים</a>`;
+
+function spanClass(i, total) { // Kia asymmetric grid
+  const full = Math.floor(total / 4), rem = total % 4, lastStart = full * 4;
+  if (rem > 0 && i >= lastStart) {
+    const p = i - lastStart;
+    if (rem === 1) return 'col-span-2 lg:col-span-3';
+    if (rem === 2) return p === 0 ? 'col-span-1 lg:col-span-2' : 'col-span-1';
+    return 'col-span-1';
+  }
+  const rev = Math.floor(i / 4) % 2 === 1, pos = i % 4;
+  if (pos === 0) return rev ? 'lg:row-span-2' : 'lg:col-span-2';
+  if (pos === 1) return rev ? 'lg:col-span-2' : 'lg:row-span-2';
+  return '';
+}
+
+// Tile picture: one photo, or for the kit a collage of its 5 products
+function tileMedia(it) {
+  const p = photos[it.slug];
+  if (!p.tile) return `
+    <div class="media absolute inset-0">
+      <img src="${I(KIT_TRUNK)}" alt="" class="absolute inset-0 h-full w-full object-cover">
+      <div class="absolute inset-x-[14%] top-[30%] flex items-end justify-center gap-[2%]">
+        ${partPhotos.map(src => `<div class="aspect-square w-[18%] overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black/5 sm:rounded-lg"><img src="${I(src)}" alt="" class="h-full w-full object-contain p-[8%]"></div>`).join('')}
+      </div>
+    </div>`;
+  return `<img src="${I(p.tile)}" alt="" class="media absolute inset-0 h-full w-full ${p.light ? 'bg-white object-contain p-4 sm:p-8' : 'object-cover'}">`;
+}
+
+function renderHome() {
+  document.title = 'אדי × טרייד מוביל';
+  const order = tileOrder.map(s => items.find(x => x.slug === s));
+  return `
+  <section class="px-4 pb-6 pt-8 text-center sm:pb-8 sm:pt-12">
+    <h1 class="rise text-3xl font-black leading-tight sm:text-5xl" style="text-wrap:balance">בחרו את ההטבה שלכם</h1>
+  </section>
+
+  <main id="products" class="px-1 pb-1">
+    <div class="grid grid-cols-2 auto-rows-[180px] gap-1 md:auto-rows-[240px] lg:grid-cols-3 lg:auto-rows-[340px]">
+      ${order.map((it, i) => `
+      <a href="#p-${it.slug}" class="tile group relative block overflow-hidden bg-neutral-200 ${spanClass(i, order.length)}">
+        ${tileMedia(it)}
+        <div class="shade pointer-events-none absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.25) 45%, rgba(0,0,0,.08) 100%)"></div>
+        <div class="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 px-3 pb-5 text-center text-white sm:pb-8">
+          <h2 class="text-base font-bold leading-snug drop-shadow-lg sm:text-2xl lg:text-3xl" style="text-wrap:balance">${it.title}</h2>
+          <span class="text-sm font-medium text-white/90 drop-shadow sm:text-lg">${fmt(it.price)}</span>
+        </div>
+      </a>`).join('')}
+    </div>
+  </main>`;
+}
+
+function renderReps() {
+  document.title = 'מידע לנציגים – אדי × טרייד מוביל';
+  return `
+  <div class="mx-auto max-w-4xl px-4 pb-16 pt-5 sm:px-6">
+    ${backLink}
+    <h1 class="text-2xl font-bold text-neutral-900 sm:text-4xl">מידע לנציגים</h1>
+
+    <h2 class="mb-3 mt-8 text-lg font-bold text-neutral-900 sm:text-xl">עמלות</h2>
+    <div class="overflow-x-auto rounded-2xl border border-neutral-200">
+      <table class="w-full min-w-[30rem] text-right text-sm sm:text-base" style="font-variant-numeric:tabular-nums">
+        <thead class="bg-neutral-50 text-neutral-500">
+          <tr>
+            <th class="px-4 py-3 font-medium">מוצר / חבילה</th>
+            <th class="px-3 py-3 font-medium">שווי ההטבה</th>
+            <th class="px-3 py-3 font-medium">עמלת נציג</th>
+            <th class="px-3 py-3 font-medium">עמלת מנהל</th>
+          </tr>
+        </thead>
+        <tbody>${items.map(it => `
+          <tr class="border-t border-neutral-100">
+            <td class="px-4 py-3 font-medium text-neutral-900">${it.title}</td>
+            <td class="whitespace-nowrap px-3 py-3 text-neutral-600">${fmt(it.price)}</td>
+            <td class="whitespace-nowrap px-3 py-3 font-bold text-neutral-900">${fmt(commissions[it.slug][0])}</td>
+            <td class="whitespace-nowrap px-3 py-3 font-bold text-neutral-900">${fmt(commissions[it.slug][1])}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 class="mb-3 mt-10 text-lg font-bold text-neutral-900 sm:text-xl">דגשי ביצוע ותפעול</h2>
+    <dl class="divide-y divide-neutral-100 rounded-2xl border border-neutral-200">
+      <div class="grid gap-1 p-4 sm:grid-cols-[12rem_1fr] sm:gap-6 sm:p-5">
+        <dt class="font-bold text-neutral-900">מיקום התקנות ושירות</dt>
+        <dd class="text-neutral-600">${INSTALL_ALL}</dd>
+      </div>
+      <div class="grid gap-1 p-4 sm:grid-cols-[12rem_1fr] sm:gap-6 sm:p-5">
+        <dt class="font-bold text-neutral-900">איתור אקילס</dt>
+        <dd class="text-neutral-600">מערכת איתור פעילה עם לוח מקשים בלבד, אינה כוללת דמי מנוי, ויש לבדוק מול הלקוח לפני דרישת מיגון.</dd>
+      </div>
+      <div class="grid gap-1 p-4 sm:grid-cols-[12rem_1fr] sm:gap-6 sm:p-5">
+        <dt class="font-bold text-neutral-900">עמלות</dt>
+        <dd class="text-neutral-600">במכירת חבילות האבזור הקבועות משולמת עמלה לנציג ולמנהל כמפורט בטבלה.</dd>
+      </div>
+    </dl>
+  </div>`;
+}
+
+// SKU with a one-tap copy button (shown only when filled in)
+const copyIco = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const skuChip = key => {
+  const sku = (SKUS[key] || '').trim();
+  if (!sku) return '';
+  return `<button data-copy="${sku}" class="inline-flex items-center gap-2 self-start rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-sm text-neutral-700 transition hover:border-neutral-400 hover:bg-white" title="העתקת המק״ט">
+    <span class="text-neutral-500">מק״ט</span><span class="font-mono font-bold tracking-wide" dir="ltr">${sku}</span><span class="text-neutral-400">${copyIco}</span>
+  </button>`;
+};
+
+const sheetBtn = (url, title, ink, big) => `
+  <button data-sheet="${url}" data-title="${title}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 font-bold text-white shadow-sm transition hover:bg-blue-700 ${big ? 'w-full px-6 py-4 text-lg sm:w-auto' : 'w-full px-4 py-3 text-base'}">
+    ${svg('file', big ? 'h-6 w-6' : 'h-5 w-5', 2)} דף מוצר
+  </button>`;
+
+function renderItem(slug) {
+  const it = items.find(x => x.slug === slug);
+  if (!it) return renderHome();
+  document.title = it.title + ' – אדי × טרייד מוביל';
+  return `
+  <div class="mx-auto max-w-5xl px-4 pb-16 pt-5 sm:px-6">
+    ${backLink}
+    ${it.parts ? `
+    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-2xl font-bold text-neutral-900 sm:text-4xl">${it.title}</h1>
+        ${skuChip(it.slug)}
+      </div>
+      <div class="text-left">
+        <div class="text-sm text-neutral-500">שווי ההטבה</div>
+        <div class="text-3xl font-extrabold">${fmt(it.price)}</div>
+      </div>
+    </div>` : `
+    <div class="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm md:flex">
+      <div class="flex flex-col gap-2 bg-neutral-50 p-2 md:w-[26rem] md:shrink-0">
+        <div class="aspect-[4/3] max-w-full overflow-hidden rounded-xl bg-white">
+          <img id="mainPhoto" src="${I(photos[slug].gallery[0])}" alt="${it.title}" class="h-full w-full ${photos[slug].cover ? 'object-cover' : 'object-contain'}">
+        </div>
+        ${photos[slug].gallery.length > 1 ? `<div class="flex gap-2 overflow-x-auto pb-1">${photos[slug].gallery.map((g, n) => `
+          <button data-photo="${I(g)}" class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-white sm:h-20 sm:w-20 ${n === 0 ? 'border-neutral-900' : 'border-transparent'}" aria-label="תמונה ${n + 1}">
+            <img src="${I(g)}" alt="" loading="lazy" class="h-full w-full object-cover">
+          </button>`).join('')}</div>` : ''}
+      </div>
+      <div class="flex min-w-0 flex-1 flex-col gap-4 p-5 sm:p-7">
+        <div>
+          <h1 class="text-2xl font-extrabold leading-tight sm:text-3xl" style="text-wrap:balance">${it.title}</h1>
+          <p class="mt-2 text-base text-neutral-600 sm:text-lg">${it.lead}</p>
+        </div>
+        ${skuChip(it.slug)}
+        ${it.points ? `<ul class="space-y-2">${it.points.map(p => `<li class="flex items-start gap-2 text-base sm:text-lg">${star}<span>${p}</span></li>`).join('')}</ul>` : ''}
+        ${it.small ? `<p class="text-sm font-medium text-neutral-500">${it.small}</p>` : ''}
+        <p class="flex items-start gap-2 text-sm text-neutral-600 sm:text-base"><span class="text-neutral-400">${svg('pin', 'h-5 w-5 mt-0.5 shrink-0', 2)}</span><span><b>התקנה:</b> ${install[it.slug] || installDefault}</span></p>
+        ${it.repNote ? `<p class="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900"><b>לנציג:</b> ${it.repNote}</p>` : ''}
+        <div class="mt-auto flex flex-col gap-4 border-t border-neutral-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div class="text-sm text-neutral-500">שווי ההטבה</div>
+            <div class="text-3xl font-extrabold">${fmt(it.price)}</div>
+          </div>
+          ${it.sheet ? sheetBtn(it.sheet, it.title, it.ink, true) : ''}
+        </div>
+      </div>
+    </div>`}
+
+    ${it.parts ? `
+    <h2 class="mb-4 mt-8 text-xl font-bold sm:text-2xl">מה יש בערכה?</h2>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      ${it.parts.map((p, n) => `
+      <div class="flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        <div class="relative aspect-[4/3] max-w-full overflow-hidden bg-white">
+          <img src="${I(partPhotos[n])}" alt="${p.name}" loading="lazy" class="h-full w-full object-contain p-3">
+          <span class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 text-sm font-bold text-neutral-700">${n + 1}</span>
+        </div>
+        <div class="flex flex-1 flex-col gap-2 p-4">
+          <h3 class="text-lg font-bold leading-snug">${p.name}</h3>
+          ${skuChip('bcare-' + (n + 1))}
+          <p class="text-sm text-neutral-600 sm:text-base">${p.line}</p>
+          <div class="mt-auto pt-2">${sheetBtn(p.sheet, p.name, it.ink, false)}</div>
+        </div>
+      </div>`).join('')}
+    </div>` : ''}
+  </div>`;
+}
+
+// ───── Hamburger menu ─────
+const drawer = document.getElementById('drawer'), scrim = document.getElementById('scrim');
+const menuLink = (href, icon, label, color, extra = '') =>
+  `<a href="${href}" ${extra} class="flex items-center gap-3 rounded-xl px-3 py-3 font-medium hover:bg-neutral-50">
+     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style="background:${color[0]};color:${color[1]}">${svg(icon, 'h-5 w-5', 2)}</span>${label}</a>`;
+document.getElementById('menuList').innerHTML = `
+  ${menuLink('#home', 'home', 'דף הבית', ['#f5f5f5', '#404040'])}
+  <div class="px-3 pb-1 pt-4 text-xs font-bold text-neutral-400">המוצרים</div>
+  ${items.map(it => menuLink('#p-' + it.slug, it.icon, it.title, ['#f5f5f5', '#404040'])).join('')}
+  <div class="my-3 border-t border-neutral-100"></div>
+  ${menuLink('#reps', 'users', 'מידע לנציגים', ['#f5f5f5', '#404040'])}`;
+function openMenu()  { drawer.classList.remove('translate-x-full'); scrim.classList.remove('hidden'); }
+function closeMenu() { drawer.classList.add('translate-x-full'); scrim.classList.add('hidden'); }
+
+// ───── Product-sheet viewer: shows the sheet as a sharp image (rendered from the PDF by Windows' PDF engine) ─────
+const modal = document.getElementById('sheet');
+const sheetImage = url => url.replace(/^sheets\/(.+)\.pdf$/, 'sheets/img/$1-1.jpg');
+function openSheet(url, title) {
+  const img = sheetImage(url);
+  document.getElementById('sheetTitle').textContent = title;
+  document.getElementById('sheetLink').href = img;
+  document.getElementById('sheetBody').innerHTML =
+    `<div class="mx-auto max-w-3xl p-2 sm:p-4"><img src="${img}" alt="${title} – דף מוצר" class="h-auto w-full rounded-lg bg-white shadow"></div>`;
+  modal.classList.replace('hidden', 'flex');
+  document.body.style.overflow = 'hidden';
+}
+// ───── Copy SKU + small "copied" toast ─────
+const toast = document.createElement('div');
+toast.className = 'pointer-events-none fixed inset-x-0 z-[70] mx-auto w-max rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white opacity-0 shadow-lg transition-opacity duration-300';
+toast.style.bottom = 'calc(1.5rem + env(safe-area-inset-bottom, 0px))';
+toast.setAttribute('role', 'status');
+document.body.appendChild(toast);
+let toastTimer;
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 1800);
+}
+function copySku(sku, btn) {
+  const fallback = () => {
+    const r = document.createRange();
+    r.selectNodeContents(btn.querySelector('[dir="ltr"]'));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    try { document.execCommand('copy'); showToast('המק״ט ' + sku + ' הועתק'); }
+    catch { showToast('סמנו את המק״ט והעתיקו'); }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(sku).then(() => showToast('המק״ט ' + sku + ' הועתק'), fallback);
+  } else fallback();
+}
+
+function closeSheet() {
+  modal.classList.replace('flex', 'hidden');
+  document.getElementById('sheetBody').innerHTML = '';
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('click', e => {
+  const cp = e.target.closest('[data-copy]');
+  if (cp) { copySku(cp.dataset.copy, cp); return; }
+  const ph = e.target.closest('[data-photo]');
+  if (ph) {
+    document.getElementById('mainPhoto').src = ph.dataset.photo;
+    ph.parentElement.querySelectorAll('[data-photo]').forEach(x => x.classList.replace('border-neutral-900', 'border-transparent'));
+    ph.classList.replace('border-transparent', 'border-neutral-900');
+    return;
+  }
+  const b = e.target.closest('[data-sheet]');
+  if (b) return openSheet(b.dataset.sheet, b.dataset.title);
+  if (e.target === modal || e.target.closest('#sheetClose')) return closeSheet();
+  if (e.target.closest('#menuBtn')) return openMenu();
+  if (e.target === scrim || e.target.closest('#menuClose')) return closeMenu();
+  const s = e.target.closest('[data-scroll]');
+  if (s) {
+    e.preventDefault(); closeMenu();
+    if (location.hash && location.hash !== '#home') location.hash = 'home';
+    setTimeout(() => document.getElementById(s.dataset.scroll)?.scrollIntoView({ behavior: 'smooth' }), 60);
+    return;
+  }
+  if (e.target.closest('#drawer a')) closeMenu();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSheet(); closeMenu(); } });
+
+function route() {
+  const h = location.hash.slice(1);
+  closeMenu();
+  const app = document.getElementById('app');
+  app.innerHTML = h === 'reps' ? renderReps() : h.startsWith('p-') ? renderItem(h.slice(2)) : renderHome();
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+route();
+</script>
+
+</body>
+</html>
