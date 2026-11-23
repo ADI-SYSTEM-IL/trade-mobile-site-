@@ -227,9 +227,9 @@ const SKUS = {
 };
 
 const commissions = { q200: [100, 50], screens: [150, 50], bcare: [100, 50], achilles: [150, 50], polish: [150, 50], jbl: [100, 50] };
-const INSTALL_ALL = 'כלל ההתקנות והשירותים מתבצעים בא.ד.י מערכות (רח׳ אליהו איתן 1, ראשון לציון), בתחנות התקנה / תחנות דיטיילינג (בהתאם למוצר), או בבית הלקוח בתיאום מראש מול אדי מערכות.';
+const INSTALL_ALL = 'כלל ההתקנות והשירותים מתבצעים בא.ד.י מערכות (רח׳ אליהו איתן 1, ראשון לציון), או בתחנות התקנה / תחנות דיטיילינג (בהתאם למוצר).';
 const install = { polish: 'בתחנות הדיטיילינג', jbl: 'בתחנות ההתקנה' };
-const installDefault = 'בא.ד.י מערכות בראשון לציון, בתחנות התקנה, או בבית הלקוח בתיאום מראש';
+const installDefault = 'בא.ד.י מערכות בראשון לציון או בתחנות התקנה';
 
 const fmt = n => '₪' + n.toLocaleString('he-IL');
 const star = '<span class="text-amber-400">★</span>';
@@ -1049,10 +1049,10 @@ function openPasswordDialog() {
       <div class="flex items-center justify-between"><h2 id="pwTitle" class="text-xl font-bold text-neutral-900">שינוי סיסמה</h2>
         <button type="button" data-pw="close" aria-label="סגירה" class="rounded-full p-1 text-xl leading-none text-neutral-400 hover:bg-neutral-100">✕</button></div>
       <label class="block text-sm font-medium text-neutral-700">סיסמה חדשה
-        <input name="p1" type="password" required minlength="8" autocomplete="new-password" dir="ltr" class="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-base focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></label>
+        <input name="p1" type="password" required minlength="6" autocomplete="new-password" dir="ltr" class="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-base focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></label>
       <label class="block text-sm font-medium text-neutral-700">שוב את הסיסמה החדשה
-        <input name="p2" type="password" required minlength="8" autocomplete="new-password" dir="ltr" class="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-base focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></label>
-      <p class="text-xs text-neutral-500">לפחות 8 תווים.</p>
+        <input name="p2" type="password" required minlength="6" autocomplete="new-password" dir="ltr" class="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-base focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></label>
+      <p class="text-xs text-neutral-500">לפחות 6 תווים.</p>
       <p data-pw="msg" class="hidden text-sm"></p>
       <button class="w-full rounded-lg bg-blue-600 py-2.5 font-semibold text-white hover:bg-blue-700">שמירה</button>
     </form>`;
