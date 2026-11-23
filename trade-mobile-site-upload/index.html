@@ -706,6 +706,42 @@ function trackPage() {
 }
 window.addEventListener('cookie-consent-changed', () => { lastTracked = ''; trackPage(); });
 
+// Time spent in a product window (sent when it closes, like Kia: only 3 seconds and up)
+let dwell = null;
+function startDwell(slug) { endDwell(); dwell = { slug, start: Date.now() }; }
+function endDwell() {
+  if (!dwell) return;
+  const ms = Date.now() - dwell.start, slug = dwell.slug;
+  dwell = null;
+  if (ms >= 3000) trackEvent('dwell_time', { page: '/p-' + slug, product: slug, metadata: { duration_seconds: Math.min(3600, Math.round(ms / 1000)) } });
+}
+// Leaving the site / switching app while a product is open also ends the visit to it
+addEventListener('pagehide', endDwell);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && dwell) { const slug = dwell.slug; endDwell(); dwell = { slug, start: Infinity }; }
+  else if (document.visibilityState === 'visible' && dwell && dwell.start === Infinity) dwell.start = Date.now();
+});
+
+// Scroll depth 25/50/75/100% (like Kia), once per page view; product windows are measured inside the window
+let scrollSeen = { key: '', marks: new Set() };
+function trackScroll(key, el) {
+  const max = el ? el.scrollHeight - el.clientHeight : document.documentElement.scrollHeight - innerHeight;
+  if (max <= 0) return;
+  const pct = (el ? el.scrollTop : scrollY) / max * 100;
+  if (scrollSeen.key !== key) scrollSeen = { key, marks: new Set() };
+  [[25, 25], [50, 50], [75, 75], [100, 95]].forEach(([mark, need]) => {
+    if (pct >= need && !scrollSeen.marks.has(mark)) {
+      scrollSeen.marks.add(mark);
+      trackEvent('scroll_depth', { page: key, product: key.startsWith('/p-') ? key.slice(3) : null, metadata: { depth: mark } });
+    }
+  });
+}
+let scrollTimer = 0;
+addEventListener('scroll', () => {
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(() => { if (!dwell && location.hash !== '#admin') trackScroll(lastTracked || '/'); }, 150);
+}, { passive: true });
+
 // ───── Hamburger menu ─────
 const drawer = document.getElementById('drawer'), scrim = document.getElementById('scrim');
 const menuLink = (href, icon, label, color, extra = '') =>
@@ -782,9 +818,16 @@ function openItem(slug) {
   itemModal.classList.replace('hidden', 'flex');
   itemModal.firstElementChild.scrollTop = 0;
   document.body.style.overflow = 'hidden';
+  startDwell(slug);
+  let t = 0;
+  itemModal.firstElementChild.addEventListener('scroll', e => {
+    clearTimeout(t);
+    t = setTimeout(() => trackScroll('/p-' + slug, e.target), 150);
+  }, { passive: true });
 }
 function closeItem() {
   if (itemModal.classList.contains('hidden')) return;
+  endDwell();
   itemModal.classList.replace('flex', 'hidden');
   itemModal.innerHTML = '';
   document.body.style.overflow = '';
@@ -887,11 +930,11 @@ async function fetchEvents(days) {
   return rows;
 }
 const PAGE_NAMES = { '/': 'דף הבית', '/reps': 'מידע לנציגים', '/accessibility': 'הצהרת נגישות', '/terms': 'תקנון', '/privacy': 'מדיניות פרטיות' };
-const barRow = (label, n, max, color = 'bg-blue-500', extra = '') => `
+const barRow = (label, n, max, color = 'bg-blue-500', extra = '', labelW = 'w-40 sm:w-56') => `
   <div class="flex items-center gap-3 text-sm">
-    <span class="w-40 shrink-0 truncate text-neutral-700 sm:w-56">${label}</span>
+    <span class="${labelW} shrink-0 truncate text-neutral-700">${label}</span>
     <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-neutral-100"><div class="h-full rounded-full ${color}" style="width:${max ? Math.max(2, n / max * 100) : 0}%"></div></div>
-    <span class="w-20 shrink-0 text-left font-semibold tabular-nums text-neutral-900">${n.toLocaleString('he-IL')}${extra}</span>
+    <span class="min-w-[2.5rem] shrink-0 whitespace-nowrap text-left font-semibold tabular-nums text-neutral-900">${n.toLocaleString('he-IL')}${extra}</span>
   </div>`;
 
 async function renderAdminDashboard() {
@@ -923,14 +966,24 @@ async function renderAdminDashboard() {
   // Products
   const prodStats = items.map(it => {
     const pv = productViews.filter(r => r.product === it.slug);
-    return { title: it.title, opens: pv.length, people: new Set(pv.map(r => r.session_id)).size, sheets: sheetViews.filter(r => r.product === it.slug).length };
+    const dw = rows.filter(r => r.event_type === 'dwell_time' && r.product === it.slug).map(r => +(r.metadata || {}).duration_seconds || 0);
+    return { title: it.title, opens: pv.length, people: new Set(pv.map(r => r.session_id)).size, sheets: sheetViews.filter(r => r.product === it.slug).length,
+      dwell: dw.length ? Math.round(dw.reduce((a, b) => a + b, 0) / dw.length) : null };
   }).sort((a, b) => b.opens - a.opens);
+  const fmtDur = s => s == null ? '—' : s < 60 ? `${s} שנ׳` : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} דק׳`;
+
+  // Scroll depth (like Kia): how many got to 25/50/75/100% of a page
+  const scrollRows = rows.filter(r => r.event_type === 'scroll_depth');
+  const depthCount = d => scrollRows.filter(r => +(r.metadata || {}).depth === d).length;
+  const depth25 = depthCount(25) || 1;
+  const scrollCard = [25, 50, 75, 100].map(d => barRow(`${d}%`, depthCount(d), depth25, 'bg-blue-500', '', 'w-12')).join('') +
+    '<p class="pt-1 text-xs text-neutral-400">כמה מגלגלים עד הסוף? (דף הבית וחלונות המוצרים)</p>';
   const prodMax = Math.max(0, ...prodStats.map(p => p.opens));
   const prodTable = `
     <div class="overflow-x-auto"><table class="w-full text-sm">
-      <thead><tr class="border-b border-neutral-200 text-right text-neutral-500"><th class="py-2 font-medium">מוצר</th><th class="py-2 font-medium">פתיחות</th><th class="py-2 font-medium">מבקרים</th><th class="py-2 font-medium">דף מוצר</th><th class="hidden w-1/3 py-2 sm:table-cell"></th></tr></thead>
+      <thead><tr class="border-b border-neutral-200 text-right text-neutral-500"><th class="py-2 font-medium">מוצר</th><th class="py-2 font-medium">פתיחות</th><th class="py-2 font-medium">מבקרים</th><th class="py-2 font-medium">דף מוצר</th><th class="py-2 font-medium">זמן צפייה ממוצע</th><th class="hidden w-1/4 py-2 sm:table-cell"></th></tr></thead>
       <tbody>${prodStats.map(p => `<tr class="border-b border-neutral-100">
-        <td class="py-2.5 font-medium text-neutral-900">${esc(p.title)}</td><td class="tabular-nums">${p.opens}</td><td class="tabular-nums">${p.people}</td><td class="tabular-nums">${p.sheets}</td>
+        <td class="py-2.5 font-medium text-neutral-900">${esc(p.title)}</td><td class="tabular-nums">${p.opens}</td><td class="tabular-nums">${p.people}</td><td class="tabular-nums">${p.sheets}</td><td class="whitespace-nowrap tabular-nums">${fmtDur(p.dwell)}</td>
         <td class="hidden py-2.5 sm:table-cell"><div class="h-2 overflow-hidden rounded-full bg-neutral-100"><div class="h-full rounded-full bg-emerald-500" style="width:${prodMax ? p.opens / prodMax * 100 : 0}%"></div></div></td></tr>`).join('')}</tbody>
     </table></div>`;
 
@@ -941,7 +994,7 @@ async function renderAdminDashboard() {
   Object.values(devBySession).forEach(d => { if (d in devCount) devCount[d]++; });
   const devTotal = Object.values(devCount).reduce((a, b) => a + b, 0);
   const devices = [['נייד', 'mobile', 'bg-blue-500'], ['טאבלט', 'tablet', 'bg-green-500'], ['מחשב', 'desktop', 'bg-purple-500']]
-    .map(([l, k, c]) => barRow(l, devCount[k], devTotal, c, devTotal ? ` <span class="font-normal text-neutral-400">(${Math.round(devCount[k] / devTotal * 100)}%)</span>` : '')).join('');
+    .map(([l, k, c]) => barRow(l, devCount[k], devTotal, c, devTotal ? ` <span class="font-normal text-neutral-400">(${Math.round(devCount[k] / devTotal * 100)}%)</span>` : '', 'w-14')).join('');
 
   // Peak hours
   const hours = Array(24).fill(0);
@@ -965,6 +1018,7 @@ async function renderAdminDashboard() {
       <div><h1 class="text-2xl font-bold text-neutral-900">אנליטיקה</h1><p class="text-sm text-neutral-500">רק מבקרים שאישרו עוגיות סטטיסטיקה נספרים</p></div>
       <div class="flex flex-wrap items-center gap-2">
         ${[7, 14, 30, 90].map(d => `<button data-days="${d}" class="rounded-full px-3.5 py-1.5 text-sm font-medium ${d === adminDays ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'}">${d} ימים</button>`).join('')}
+        <button id="adminPassword" class="rounded-full border border-neutral-300 px-3.5 py-1.5 text-sm text-neutral-600 hover:bg-neutral-50">שינוי סיסמה</button>
         <button id="adminLogout" class="rounded-full border border-neutral-300 px-3.5 py-1.5 text-sm text-neutral-600 hover:bg-neutral-50" title="${esc(session?.user?.email)}">יציאה</button>
       </div>
     </div>
@@ -974,14 +1028,51 @@ async function renderAdminDashboard() {
     <div class="mt-4 grid gap-4">
       ${adminCard('מבקרים לפי יום', chart)}
       ${adminCard('המוצרים', prodTable)}
-      <div class="grid gap-4 lg:grid-cols-2">
+      <div class="grid gap-4 lg:grid-cols-3">
         ${adminCard('התפלגות מכשירים', `<div class="space-y-3">${devices}</div>`)}
+        ${adminCard('עומק גלילה', `<div class="space-y-3">${scrollCard}</div>`)}
         ${adminCard('שעות שיא', peak)}
       </div>
       ${adminCard('עמודים', `<div class="space-y-3">${pages}</div>`)}
     </div>`;
   box.querySelectorAll('[data-days]').forEach(b => b.addEventListener('click', () => { adminDays = +b.dataset.days; renderAdminDashboard(); }));
   document.getElementById('adminLogout').addEventListener('click', async () => { await sb.auth.signOut(); renderAdminLogin(); });
+  document.getElementById('adminPassword').addEventListener('click', openPasswordDialog);
+}
+
+// Change the signed-in user's own password
+function openPasswordDialog() {
+  const wrap = document.createElement('div');
+  wrap.className = 'fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4';
+  wrap.innerHTML = `
+    <form class="w-full max-w-sm space-y-4 rounded-2xl bg-white p-6 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+      <div class="flex items-center justify-between"><h2 id="pwTitle" class="text-xl font-bold text-neutral-900">שינוי סיסמה</h2>
+        <button type="button" data-pw="close" aria-label="סגירה" class="rounded-full p-1 text-xl leading-none text-neutral-400 hover:bg-neutral-100">✕</button></div>
+      <label class="block text-sm font-medium text-neutral-700">סיסמה חדשה
+        <input name="p1" type="password" required minlength="8" autocomplete="new-password" dir="ltr" class="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-base focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></label>
+      <label class="block text-sm font-medium text-neutral-700">שוב את הסיסמה החדשה
+        <input name="p2" type="password" required minlength="8" autocomplete="new-password" dir="ltr" class="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-base focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></label>
+      <p class="text-xs text-neutral-500">לפחות 8 תווים.</p>
+      <p data-pw="msg" class="hidden text-sm"></p>
+      <button class="w-full rounded-lg bg-blue-600 py-2.5 font-semibold text-white hover:bg-blue-700">שמירה</button>
+    </form>`;
+  document.body.appendChild(wrap);
+  const form = wrap.querySelector('form'), msg = wrap.querySelector('[data-pw="msg"]');
+  const say = (t, ok) => { msg.textContent = t; msg.className = 'text-sm ' + (ok ? 'text-emerald-600' : 'text-red-600'); };
+  wrap.addEventListener('click', e => { if (e.target === wrap || e.target.closest('[data-pw="close"]')) wrap.remove(); });
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const p1 = form.p1.value, p2 = form.p2.value;
+    if (p1 !== p2) return say('הסיסמאות לא זהות', false);
+    form.querySelector('button:last-child').disabled = true;
+    const { error } = await sb.auth.updateUser({ password: p1 });
+    form.querySelector('button:last-child').disabled = false;
+    if (error) return say(/different|same/i.test(error.message) ? 'הסיסמה החדשה זהה לישנה' : /weak|short|least/i.test(error.message) ? 'הסיסמה חלשה מדי' : 'השינוי לא הצליח. נסו שוב.', false);
+    form.p1.value = form.p2.value = '';
+    say('הסיסמה עודכנה ✓', true);
+    setTimeout(() => wrap.remove(), 1500);
+  });
+  form.p1.focus();
 }
 
 function route() {
