@@ -25,6 +25,15 @@
   .site-header { top: env(safe-area-inset-top, 0px); }
   body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: #fff; }
   @media (prefers-reduced-motion: reduce) { .rise { animation: none } .tile .media { transition: none } }
+  /* ───── Accessibility widget overrides (same as the Kia site) ───── */
+  html { font-size: calc(1rem * var(--a11y-font-scale, 1)); }
+  html.a11y-high-contrast { filter: contrast(1.4); background: #000; }
+  html.a11y-high-contrast body, html.a11y-high-contrast .bg-white, html.a11y-high-contrast main,
+  html.a11y-high-contrast section, html.a11y-high-contrast header, html.a11y-high-contrast footer { background: #000 !important; color: #fff !important; }
+  html.a11y-high-contrast a, html.a11y-high-contrast .text-blue-600 { color: #ffeb3b !important; }
+  html.a11y-highlight-links a { text-decoration: underline !important; text-decoration-thickness: 2px !important; text-underline-offset: 2px !important; outline: 1px dashed currentColor; outline-offset: 2px; }
+  html.a11y-readable-font, html.a11y-readable-font body, html.a11y-readable-font * { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: .02em; }
+  html.a11y-reduced-motion *, html.a11y-reduced-motion *::before, html.a11y-reduced-motion *::after { animation-duration: .001s !important; animation-delay: 0s !important; transition-duration: .001s !important; }
   *:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
 </style>
 
@@ -54,6 +63,50 @@
 </nav>
 
 <div id="app"></div>
+
+<!-- Footer (same as the Kia site) -->
+<footer class="border-t border-neutral-100 bg-white py-3" style="padding-bottom:calc(.75rem + env(safe-area-inset-bottom, 0px))">
+  <div class="flex flex-col items-center gap-1.5 px-4 text-xs text-neutral-400">
+    <span>© כל הזכויות שמורות לאדי מערכות</span>
+    <a id="waLink" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-neutral-400 transition-colors hover:text-neutral-600">
+      <span>לכל שאלה</span>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="h-4 w-4" aria-label="WhatsApp"><circle cx="16" cy="16" r="16" fill="#25D366"/><path d="M22.9 9.1A9.7 9.7 0 0 0 16 6.3a9.74 9.74 0 0 0-8.43 14.6L6.3 25.7l4.93-1.3a9.73 9.73 0 0 0 4.77 1.22h.01A9.74 9.74 0 0 0 25.7 16a9.68 9.68 0 0 0-2.8-6.9zm-6.9 14.97a8.08 8.08 0 0 1-4.12-1.13l-.3-.18-3.07.8.82-3-.2-.31a8.1 8.1 0 1 1 6.87 3.82zm4.44-6.07c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.54.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06a6.6 6.6 0 0 1-1.94-1.2 7.28 7.28 0 0 1-1.34-1.67c-.14-.24 0-.37.1-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.16 1.52.1.46-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z" fill="#fff"/></svg>
+    </a>
+    <div class="flex items-center gap-3">
+      <a href="#accessibility" class="transition-colors hover:text-neutral-600 hover:underline">הצהרת נגישות</a>
+      <span class="text-neutral-300">·</span>
+      <a href="#terms" class="transition-colors hover:text-neutral-600 hover:underline">תקנון</a>
+      <span class="text-neutral-300">·</span>
+      <a href="#privacy" class="transition-colors hover:text-neutral-600 hover:underline">מדיניות פרטיות</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Accessibility button + panel (same options as the Kia site) -->
+<button id="a11yBtn" aria-label="פתיחת תפריט נגישות" title="נגישות" class="fixed z-40 flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-all hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300" style="right:calc(1rem + env(safe-area-inset-right, 0px));bottom:calc(1rem + env(safe-area-inset-bottom, 0px))">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="16" cy="4" r="1"/><path d="m18 19 1-7-6 1M5 8l3-3 5.5 3-2.36 3.5M4.24 14.5a5 5 0 0 0 6.88 6M13.76 17.5a5 5 0 0 0-6.88-6"/></svg>
+</button>
+<div id="a11yPanel" role="dialog" aria-label="תפריט נגישות" class="fixed z-50 hidden w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl" style="right:calc(1rem + env(safe-area-inset-right, 0px));bottom:calc(5rem + env(safe-area-inset-bottom, 0px))">
+  <div class="flex items-center justify-between border-b border-neutral-100 bg-blue-50 px-4 py-3">
+    <h2 class="text-base font-bold text-blue-900">נגישות</h2>
+    <button id="a11yClose" aria-label="סגור תפריט נגישות" class="rounded-full p-1 text-xl leading-none text-blue-700 hover:bg-blue-100">✕</button>
+  </div>
+  <div class="space-y-3 p-4">
+    <div>
+      <p class="mb-2 text-sm font-medium text-neutral-700">גודל טקסט</p>
+      <div class="flex items-center gap-2">
+        <button data-a11y="font-" aria-label="הקטן טקסט" class="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-white text-lg hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40">−</button>
+        <div id="a11yFont" class="flex-1 text-center text-sm font-medium text-neutral-600">100%</div>
+        <button data-a11y="font+" aria-label="הגדל טקסט" class="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-white text-lg hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40">+</button>
+      </div>
+    </div>
+    <div id="a11yToggles" class="space-y-3"></div>
+    <div class="space-y-2 border-t border-neutral-100 pt-3">
+      <button data-a11y="reset" class="flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">איפוס הגדרות</button>
+      <a href="#accessibility" class="block w-full py-1 text-center text-xs text-blue-600 hover:underline">הצהרת נגישות</a>
+    </div>
+  </div>
+</div>
 
 <!-- Product-sheet viewer -->
 <div id="sheet" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 p-3 sm:p-6">
@@ -101,7 +154,7 @@ const partPhotos = ['BCARE!.jpg', 'car-vacuum-hl-109b.jpg', 'HL-010 קומפרס
 // tile: photo on the home tile (null = collage of the kit's products). TODO: lifestyle photos for kit / Achilles / JBL, sharper nano photo
 const photos = {
   q200:     { tile: 'Q200 רכב 01.jpg', gallery: ['Q200 רכב 01.jpg', 'Q200 רכב 03.png', 'תמונות מוצר Q200-03.jpg'] },
-  screens:  { tile: 'מסכים אחוריים אווירה 07012022.jpg', gallery: ['מסכים אחוריים אווירה 07012022.jpg', 'TABY+-01.png', 'TABY+ 2.png', 'מסך אנדרואיד למשענת הראש.png', 'Adi-Go-Kids (7).JPG'] },
+  screens:  { tile: 'Girl with upgraded TABY+ car screens.png', gallery: ['Girl with upgraded TABY+ car screens.png', 'TABY+-01.png', 'TABY+ 2.png', 'מסך אנדרואיד למשענת הראש.png', 'Adi-Go-Kids (7).JPG'] },
   bcare:    { tile: null, gallery: ['BCARE.jpg', 'BCARE!.jpg'] },
   achilles: { tile: 'achilles-mood.jpg', gallery: ['achilles-mood.jpg', 'מערכת איתור.png'] },
   polish:   { tile: 'ננו.jpg', gallery: ['ננו.jpg'], cover: true },
@@ -289,13 +342,13 @@ const sheetBtn = (url, title, ink, big) => `
     ${svg('file', big ? 'h-6 w-6' : 'h-5 w-5', 2)} דף מוצר
   </button>`;
 
-function renderItem(slug) {
+function renderItem(slug, inModal = false) {
   const it = items.find(x => x.slug === slug);
   if (!it) return renderHome();
   document.title = it.title + ' – אדי × טרייד מוביל';
   return `
-  <div class="mx-auto max-w-5xl px-4 pb-16 pt-5 sm:px-6">
-    ${backLink}
+  <div class="${inModal ? 'p-4 pt-14 sm:p-6 sm:pt-14' : 'mx-auto max-w-5xl px-4 pb-16 pt-5 sm:px-6'}">
+    ${inModal ? '' : backLink}
     ${it.parts ? `
     <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
       <div class="flex flex-col gap-2">
@@ -307,7 +360,7 @@ function renderItem(slug) {
         <div class="text-3xl font-extrabold">${fmt(it.price)}</div>
       </div>
     </div>` : `
-    <div class="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm md:flex">
+    <div class="${inModal ? 'overflow-hidden rounded-2xl bg-white md:flex' : 'overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm md:flex'}">
       <div class="flex flex-col gap-2 bg-neutral-50 p-2 md:w-[26rem] md:shrink-0">
         <div class="aspect-[4/3] max-w-full overflow-hidden rounded-xl bg-white">
           <img id="mainPhoto" src="${I(photos[slug].gallery[0])}" alt="${it.title}" class="h-full w-full ${photos[slug].cover ? 'object-cover' : 'object-contain'}">
@@ -356,6 +409,129 @@ function renderItem(slug) {
     </div>` : ''}
   </div>`;
 }
+
+// ───── Footer WhatsApp (same contact as the Kia site) ─────
+// phone: international format without + (e.g. 9725XXXXXXXX). Empty = the "לכל שאלה" link is hidden.
+const WHATSAPP = { phone: '972544280903', text: 'היי שני, יש לי שאלה לגבי אתר ההטבות של טרייד מוביל,' }; // שני כהן
+const waLink = document.getElementById('waLink');
+if (WHATSAPP.phone) waLink.href = `https://wa.me/${WHATSAPP.phone}?text=${encodeURIComponent(WHATSAPP.text)}`;
+else waLink.style.display = 'none';
+
+// ───── Legal pages — text copied from the Kia site (ADI's own pages) ─────
+const dot = '<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" aria-hidden="true"></span>';
+const li = t => `<li class="flex gap-2">${dot}<span>${t}</span></li>`;
+const legalShell = (title, sub, body) => `
+  <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
+    <a href="#home" class="mb-6 inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900">→ חזרה לאתר</a>
+    <h1 class="text-3xl font-bold text-neutral-900 sm:text-4xl">${title}</h1>
+    <p class="mt-2 text-base text-neutral-500">${sub}</p>
+    ${body}
+  </div>`;
+const h2 = t => `<h2 class="mb-3 text-xl font-bold text-neutral-900 sm:text-2xl">${t}</h2>`;
+const ul = arr => `<ul class="space-y-2.5 text-base leading-relaxed text-neutral-700">${arr.map(li).join('')}</ul>`;
+const numbered = secs => `<div class="mt-10 space-y-8">${secs.map(([t, items], i) => `<section>${h2(`${i + 1}. ${t}`)}${ul(items)}</section>`).join('')}`;
+
+function renderAccessibility() {
+  document.title = 'הצהרת נגישות | א.ד.י. מערכות';
+  return legalShell('הצהרת נגישות', 'א.ד.י. מערכות סטריאו ואזעקות לרכב בע״מ', `
+    <div class="mt-8 space-y-4 text-base leading-relaxed text-neutral-700">
+      <p>חברת א.ד.י מערכות סטריאו ואזעקות לרכב בע״מ נוקטת את מרב המאמצים ומשקיעה משאבים רבים על מנת לספק לכל לקוחותיה שירות שוויוני, מכובד, נגיש ומקצועי. בהתאם לחוק שוויון זכויות לאנשים עם מוגבלויות תשנ״ח-1998 ולתקנות שהותקנו מכוחו, מושקעים מאמצים ומשאבים רבים בביצוע התאמות הנגישות הנדרשות שיביאו לכך שאדם בעל מוגבלות יוכל לקבל את השירותים הניתנים לכלל הלקוחות, באופן עצמאי ושוויוני.</p>
+      <p>העולם סביבנו משתנה ואנו מחויבים להתאים עצמנו למציאות המשתנה תוך ייצור פתרונות טכנולוגיים חכמים שיאפשרו לקהל לקוחותינו חווית נסיעה יוצאת דופן.</p>
+    </div>
+    <section class="mt-10">${h2('הסדרי נגישות מבנים')}
+      <p class="mb-3 text-sm text-neutral-500">הסדרי הנגישות הקיימים במרכז קבלת הקהל בכתובת אליהו איתן 1, ראשון לציון:</p>
+      ${ul(['קיימות חניות נכים בבית העסק וחניון סמוך, כולל לרכב גבוה.', 'קיים רצף גישה מהחניה דרך הכניסה למרכז קבלת הקהל ועד לקבלת השירות (כולל מעליות).', 'קיימות עמדות נגישות לקבלת שירות במרכז קבלת קהל.', 'הותקנו עזרים מסוג "לולאת השראה" ללקויי שמיעה.', 'קיימים שירותי נכים נגישים בלובי הבניין ובקומות השונות.', 'קיימים שלטי זיהוי והכוונה.', 'מותרת כניסה למרכז קבלת הקהל לחיית שירות המיועדת לסייע לאדם עם מוגבלות.', 'במקרה של צורך, ניתן לפנות לנציגי השירות בעמדות כדי לקבל סיוע במילוי טפסים.'])}
+      <p class="mt-4 text-sm italic text-neutral-500">חברת א.ד.י מערכות אחראית על הניהול והסדרי הנגישות במרכז ההתקנות הראשי בראשון לציון בלבד, ואיננה אחראית על הסדרי הנגישות ביתר תחנות השירות אשר נמצאים בהסדר.</p>
+    </section>
+    <section class="mt-10">${h2('שירות לקוחות נגיש')}
+      <ul class="space-y-3 text-base leading-relaxed text-neutral-700">
+        <li><strong class="text-neutral-900">הדרכות עובדים לשירות נגיש</strong> – מתקיימות הדרכות להכרת תחום הנגישות, יצירת מודעות בקרב העובדים והקניית כלים מעשיים למתן שירות נגיש.</li>
+        <li><strong class="text-neutral-900">מוקד טלפוני נגיש</strong> – המענה הקולי הונגש כך שהמידע מועבר בשפה ברורה וללא מוסיקת רקע.</li>
+      </ul>
+    </section>
+    <section class="mt-10">${h2('נגישות אתר האינטרנט')}
+      <div class="space-y-3 text-base leading-relaxed text-neutral-700">
+        <p>אתר אינטרנט נגיש הוא אתר המאפשר לאנשים עם מוגבלות ולאנשים מבוגרים לגלוש באותה רמה של יעילות והנאה ככל הגולשים. כ-20 עד 25 אחוזים מהאוכלוסייה נתקלים בקשיי שימוש באינטרנט ועשויים להיטיב מתכני אינטרנט נגישים יותר, כך על פי מחקר שנערך בשנת 2003 ע״י חברת מייקרוסופט.</p>
+        <p>חברת א.ד.י מערכות מאמינה ופועלת למען שוויון הזדמנויות במרחב האינטרנטי לבעלי לקויות מגוונות ואנשים הנעזרים בטכנולוגיה מסייעת לשימוש במחשב.</p>
+      </div>
+    </section>
+    <section class="mt-10">${h2('מידע על נגישות האתר')}
+      ${ul(['אתר זה עומד בדרישות תקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע״ג–2013.', 'התאמות הנגישות בוצעו עפ״י המלצות התקן הישראלי (ת״י 5568) לנגישות תכנים באינטרנט ברמת AA ומסמך WCAG 2.0 הבינלאומי.', 'הבדיקות נבחנו לתאימות הגבוהה ביותר עבור דפדפן פיירפוקס.', 'האתר מספק מבנה סמנטי עבור טכנולוגיות מסייעות ותמיכה בדפוס השימוש המקובל להפעלה עם מקלדת בעזרת מקשי החיצים, Enter ו-Esc ליציאה מתפריטים וחלונות.', 'מותאם לתצוגה בדפדפנים הנפוצים ולשימוש בטלפון הסלולרי.', 'לשם קבלת חוויית גלישה מיטבית עם תוכנת הקראת מסך, אנו ממליצים לשימוש בתוכנת NVDA העדכנית ביותר.', 'ייעוץ הנגשת אתר האינטרנט בוצע על ידי חברת A-2-Z נגישות ושיווק באינטרנט.'])}
+    </section>
+    <section class="mt-10">${h2('בקשות והצעות לשיפור')}
+      <div class="space-y-3 text-base leading-relaxed text-neutral-700">
+        <p>יש לציין כי אנו ממשיכים במאמצים לשפר את נגישות החברה כחלק ממחויבותנו לאפשר לכלל האוכלוסייה, כולל אנשים עם מוגבלויות, לקבל את השירות הנגיש ביותר.</p>
+        <p>במידה ונתקלת בבעיה או בתקלה כלשהי בנושא הנגישות, נשמח שתעדכן אותנו, ואנו נעשה כל מאמץ למצוא עבורך פתרון מתאים ולטפל בתקלה בהקדם ככל שניתן.</p>
+      </div>
+    </section>`);
+}
+
+function renderTerms() {
+  document.title = 'תנאי שימוש | א.ד.י. מערכות';
+  return legalShell('תנאי שימוש', 'א.ד.י. מערכות סטריאו ואזעקות לרכב בע״מ <span class="text-neutral-400">("העסק")</span>', numbered([
+    ['כללי', ['אנו מודים לך על העניין שגילית בשירות הנזכר באתר אותו העסק מספק ועל ביקורך באתר.', 'השימוש באתר מעיד על הסכמתך לתנאי השימוש ככתבם וכלשונם, המהווים הסכם מחייב בינך ובין העסק לכל דבר, כי קראת אותם ואתה מתחייב לפעול לפיהם וכי הינך למעלה מגיל 18.', 'אם אינך מסכים לתנאי השימוש ו/או אם אינם רלוונטיים עבורך מכל סיבה שהיא, אנא הימנע משימוש באתר או פנה אלינו ישירות כדי שנוכל לעשות כל שביכולתנו כדי לסייע לך בדרכים אחרות.', 'העסק שומר לעצמו את הזכות לשנות, למחוק ו/או להוסיף על תנאי השימוש בכל עת וללא מתן הודעה מוקדמת ו/או בדיעבד וכל תוספת ו/או שינוי כאמור יחייבו אותך עם המשך שימושך באתר לאחר ביצועם.', 'העסק שומר לעצמו את הזכות לשנות את האתר, תכולתו, עיצובו ו/או אופן פעולתו על פי שיקול דעתו המוחלט וללא כל צורך ליתן הודעה מראש ו/או בדיעבד למשתמש/לקוח.', 'העסק רשאי לחסום בפני כל משתמש ו/או לקוח את השימוש באתר על פי שיקול דעתו הבלעדי וללא כל הודעה מוקדמת.']],
+    ['העסקה, הזמנת מוצרים מהעסק באמצעות האתר ואספקתם', ['העסק שומר לעצמו את הזכות עם מי להתקשר בעסקה בהתאם לשיקול דעתו ובכפוף לכל דין.', 'האתר פועל כחנות דיגיטלית לשיווק ו/או אספקת המוצרים הנזכרים בו בתנאים המסחריים המפורטים בו. עלויות המשלוח הינן כמפורט באתר ו/או תלויות באזור האספקה ו/או במהות המוצר.', 'העסקה ואספקת המוצר המוזמן כפופים למסמכי ההזמנה ו/או להסכמה פרטנית אחרת; במידה ולא ניתן לספק מוצר כלשהו (בשל מזג אוויר, מחסור או בעיה באספקה, זמינות במלאי, מצב בטחוני או משבר וכיו"ב), העסק רשאי להודיע על ביטול העסקה תוך 5 ימי עסקים מאישור העסקה בהודעה לרוכש בדוא"ל ו/או בטלפון.', 'ההזמנה כפופה לאישור חברת האשראי הרלוונטית את העסקה מראש.']],
+    ['נכונות הפרטים הנמסרים על ידך והשימוש בהם', ['שימושך באתר ו/או פנייתך אל העסק ו/או ביצוע הזמנה באתר כפופים למסירת פרטי זיהוי מלאים, מספר תעודת זהות, איש קשר, כתובת והתקשרות וכן למסירת פרטי אמצעי תשלום וכן לאישור חברת האשראי הרלוונטית את העסקה מראש.', 'הפרטים הנמסרים על ידך ישמרו בעסק כנהוג וכמקובל וייעשה בהם כל שימוש לרבות לצורך משלוח דיוור ישיר ו/או דברי פרסומת ו/או פרטים ביחס למבצעים ו/או לשירותים המוצעים בעסק ו/או באתר, אלא אם תודיע לנו בכתב, כי אינך מסכים שנפנה אליך, בכפוף לכל דין החל על הנושא בישראל.', 'אתה מסכים ומתחייב, כי הפרטים שנמסרו על ידך מלאים, נכונים ומדוייקים וידוע לך שהעסק ו/או מי מטעמו לא יהיו אחראיים לכל אובדן או נזק הנובעים מאי עמידתך בדרישות לעיל.', 'בכפוף לכל דין החל בעניין, לא נעביר את הפרטים שנמסרו על ידך ללא הסכמתך לצד שלישי, למעט פרטים שיהא עלינו למסור לחברת הסליקה הרלוונטית עימה ו/או באמצעותה העסק ו/או האתר פועלים ו/או פרטים שיש למסור בהתאם לצו שיפוטי ו/או בהתאם לדרישת ו/או צו של רשות מוסמכת רלוונטית.']],
+    ['ביטול עסקה על ידי הלקוח', ['כמפורט במדיניות ביטול עסקה.']],
+    ['זמינות ופעילות האתר', ['מבלי לגרוע מהאמור, העסק עושה מאמצים רבים לגרום לכך שהאתר יהיה מעודכן, בטוח, זמין ונגיש לשימוש, בכפוף לשעות וימי העבודה בעסק. האתר אינו חסין מתקלות ו/או בעיות ואנו נעשה כל שביכולתנו לטפל בהן ולתקן אותן ללא דיחוי. העסק ו/או מי מטעמו לא יהא אחראי כלפיך ו/או כלפי כל צד שלישי, בכל דרך שהיא, לכל שינוי, הפסקה זמנית, השעיה או הפסקה לצמיתות של האתר ו/או תוכנו ושומר על זכותו לשנות, להשעות או להפסיק את האתר (בכללותו או בחלקו), בכל עת, עם או ללא הודעה מוקדמת.']],
+    ['קניין רוחני', ['בכפוף לדין החל על קניין רוחני בישראל, זכויות הקניין הרוחני, לרבות זכויות יוצרים, פטנטים, סימני מסחר וסודות מסחריים, באתר, בעיצובו ובתוכנו וכיו"ב, בבעלות העסק, לפי העניין. אין להעתיק, לשכפל, להפיץ כל חומר מתוך האתר ללא אישור בכתב של העסק.']],
+    ['הגבלת אחריות', ['תוכן האתר ו/או השימוש בו אינם יכולים לשמש בסיס לצורך קבלת החלטות עסקיות, כספיות, משפטיות, אישיות ו/או אחרות. כל פעולה שנעשית על-ידך בהתבסס על תוכן האתר נעשית לפי שיקול דעתך ובאחריותך בלבד.', 'האתר ותוכנו ניתנים לשימוש AS IS ללא כל התחייבות או אחריות העסק ו/או מי מטעמו לתוכן וידוע לך שחלק מהתוכן מקורו בצדדי ג\' שלעסק ו/או למי מטעמו אין ולא יכולה להיות שליטה עליהם.', 'בשום מקרה לא תהיה לעסק ו/או מי מטעמו אחריות כלפיך או כלפי צד שלישי כלשהו, במישרין או בעקיפין, עבור כל אובדן, נזק, הפסד, או לכל נזק ישיר ו/או עקיף הנובע מצדדי ג\' שלעסק ו/או מי מטעמו אין ולא יכולה להיות שליטה עליהם.', 'האחריות הניתנת למוצרים היא כמפורט בתעודת האחריות הרלוונטית.', 'התמונות באתר הן להמחשה בלבד.']],
+    ['דין ושיפוט', ['מבלי לגרוע מהאמור, על כל שימוש באתר ו/או כל תביעה, דרישה או בקשה הנובעים ממנו ו/או מכל דבר ועניין אחר הקשורים באופן ישיר או עקיף לאתר זה ו/או לשירותים המסופקים על ידי העסק במסגרתו יחולו דיני מדינת ישראל בלבד. מקום השיפוט יהיה בבית המשפט לו הסמכות במחוז המרכז והדין המהותי והפרוצדוראלי שיחול יהיה הדין הישראלי.']],
+  ]) + `</div>`);
+}
+
+function renderPrivacy() {
+  document.title = 'מדיניות הגנת המידע ופרטיות | א.ד.י. מערכות';
+  return legalShell('מדיניות הגנת המידע ופרטיות', 'א.ד.י. מערכות סטריאו ואזעקות לרכב בע״מ <span class="text-neutral-400">("א.ד.י")</span>', numbered([
+    ['כללי', ['א.ד.י. מערכות סטריאו ואזעקות לרכב בע"מ (להלן: "א.ד.י") מכבדת את פרטיות המשתמשים באתריה ו/או בנכסיה הדיגיטליים ולהלן תתכבד לפרט את מדיניותה ביחס להגנת המידע ופרטיות (להלן: "המדיניות") שחלה ו/או תחול בקשר להגנה על כל מידע אישי, מכל סוג, שא.ד.י. אוספת, מעבדת, שומרת ומשתפת במהלך פעילותה העסקית, לרבות (אך לא רק) באמצעות אתרי אינטרנט, יישומים, ממשקים אלקטרוניים לסוגיהם וכל נכס דיגיטלי שהוא (להלן לשם הנוחות: "הנכסים"). בהמשך כתב זה תפורטנה גם זכויות מסוימות העומדות למשתמשים לפי חוק הגנת הפרטיות, התשמ"א-1981.', 'המדיניות עשויה להתעדכן מעת לעת, והעדכונים והשינויים ייכנסו לתוקף, יפורסמו ויעודכנו במסגרת הנכסים. המשך השימוש של המשתמש בשירותים לאחר עדכון מדיניות הפרטיות ייחשב הסכמה מצדו למדיניות הפרטיות המעודכנת, לרבות לשינויים.', 'בכל דבר ו/או עניין, שאלה, הערה וכיו"ב בקשר למדיניות ניתן ליצור קשר עם א.ד.י. מערכות סטריאו ואזעקות לרכב בע"מ, אליהו איתן 1 ראשון לציון.']],
+    ['עקרונות', ['בעת שימוש בנכסים נאסף מידע על המשתמש. חלק מהמידע נמסר ביודעין ו/או מזהה את המשתמש אישית בשמו ובכתובתו, במספר הטלפון שלו (קווי או נייד), בכתובת הדוא"ל שלו, במספר תעודת הזהות שלו או במספר התאגיד שלו, בשימושו בנכסים ובטיב ואופן השימוש, אמצעי תשלום בהם נעשה שימוש, מידע נוסף שהמשתמש יבחר למסור בטפסים או בהרשמות בנכסים וכיו"ב. חלק מהמידע הינו סטטיסטי ומצטבר ואינו מזהה את המשתמש אישית ואינו נשמר ביחד עם פרטי המשתמש, כגון תכנים שנקראו, העמודים שנצפו, כתובת האינטרנט (IP) שממנה נעשו פניות ועוד.', 'א.ד.י. מחויבת לכך שהמידע האישי של המשתמש ופרטיותו יהיו מוגנים בהתאם לחובות שחלות עליה לפי הדין. מדיניות זו מסבירה את זכויות המשתמש לגבי המידע האישי שא.ד.י אוספת, מעבדת ושומרת במהלך פעילותה העסקית באמצעות הנכסים ולגבי שימוש שלה באמצעי הגנה בכדי להגן על מידע זה.', 'א.ד.י. פועלת כדי שהמידע האישי של המשתמש ייאסף, יישמר ויאוחסן אצלה בהתאם לכל דין, בהגינות, שקיפות, תום לב ומידתיות, תוך נקיטה בפעולות המתאימות ותוך שאיפה להקטנת הסיכונים העשויים להתרחש כתוצאה מתהליכי עיבוד המידע.', 'איסוף, עיבוד ושימוש במידע האישי של המשתמש עשוי להתבצע על ידי צדדים שלישיים שפועלים מטעמה של א.ד.י. במהלך העסקים השוטף שלה ו/או תוך כדי מתן השירותים על ידה.']],
+    ['הטעמים לשימוש במידע האישי', ['א.ד.י. משתמשת במידע האישי של המשתמש כדי לספק למשתמש את השירותים שהוא מבקש, כדי לעבד את הבקשות שלו ואת השימוש שלו במסגרת הנכסים, כדי לשפר את חוויית המשתמש שלו ולפתח שירותים נוספים, וכן כדי להציע למשתמש שירותים נוספים, לשלוח לו עדכונים, הודעות, דברי פרסומת וכיו"ב, כפוף להסכמתו. כמו כן א.ד.י. אוספת את המידע האישי של המשתמש לשם תחזוקה של השירותים, ניטור פעילות המשתמש בנכסים, שיפור איכות השירותים, יצירת קשר עם המשתמש, עריכת נתונים סטטיסטיים, ניתוח, מחקר והעברת מידע (לרבות סטטיסטי) לצדדים שלישיים, עריכת סקרים, התאמת מודעות שיוצגו למשתמשים ועשויים להתאים להעדפותיהם, ניתוח פרופילים של המשתמשים לשם שיווק מוצרים, לצרכי דיוור ישיר, לצרכים פנימיים של א.ד.י., לשם התגוננות מפני תביעות, דרישות וטענות נגד א.ד.י. ומי מטעמה וכן נגד צדדים שלישיים, לשם אכיפה של הוראות המדיניות, ולשם עמידה בהוראות כל דין.', 'המידע האישי של המשתמש משמש גם עבור קבצי "עוגיות" (Cookies) (וטכנולוגיות דומות) ומעקב נכסים, אתרים ובאפליקציות המאפשרים להבדיל אותו ממשתמשים אחרים, ולשפר את השימוש שלו בממשקים אלה.', 'השימוש ב"עוגיות" (Cookies) וטכנולוגיות דומות נעשה לצורך התפעול השוטף והתקין, ובכלל זה כדי לאסוף ולשמר נתונים סטטיסטיים אודות השימוש בנכסים, לשם אימות פרטי המשתמש, כדי להתאים אותם להעדפות/הגדרות המשתמש ולשלוח עדכונים, הודעות ודברי פרסומת מתאימים, לניתוח סטטיסטי של ביצועי נכסים, ניתוח המגמה, ניטור שגיאות זיהוי ולצורכי אבטחת מידע. "עוגיות" (Cookies) וטכנולוגיות דומות אינם יכולים להתקין תוכנות זדוניות כגון וירוסים במכשיר של המשתמש.', 'מובהר כי באפשרות המשתמש לשלוט ב"עוגיות" (Cookies) וטכנולוגיות דומות ברמת הדפדפן הפרטי וכן להימנע מקבלתם או למחוק את הקבצים הנ"ל. אם המשתמש לא יודע כיצד לעשות זאת, עליו לבדוק זאת באמצעות הדפדפן בו הוא עושה שימוש. השימוש של המשתמש בשירותים ייחשב הסכמה מצדו לשימוש ב"עוגיות" (Cookies) וטכנולוגיות דומות כאמור לעיל עד כמה שהשימוש מתאפשר בשים לב לפעולות שהמשתמש נקט (או לא נקט) ברמת הדפדפן הפרטי שלו, כאמור לעיל.']],
+    ['סוגי המידע האישי שנאסף ומטרות האיסוף והעיבוד', ['המידע האישי של המשתמש שנאסף ו/או מעובד ו/או שבו נעשה שימוש, מוגבל למידע הנחוץ לא.ד.י. כדי לספק למשתמש שירותים במהלך עסקיה, תוך הגנה על המידע וקיום חובות המוטלות על א.ד.י. על-פי דין בקשר לכך. הגישה למידע, הכוללת גם גישה פיזית, מוגבלת לעובדים ולצדדים שלישיים המתקשרים עם א.ד.י., והם משתמשים בו למטרות המפורטות להלן בלבד.', 'המידע שנאסף ומעובד כולל גם מידע כללי המשמש למטרות טכניות ובהתאם לשירותים שא.ד.י. תבחר ותשתמש בהם.', 'עשוי להיות עיבוד ואחסון אוטומטי של מידע אישי של המשתמש. מידע זה כולל גם כתובות IP, סוג הדפדפן, ספק שירותי האינטרנט, דפי הפניה ויציאה, מערכות הפעלה, חותמת תאריך / שעה ונתונים של הקלקות, וא.ד.י עשויה להשתמש בו כדי לנתח מגמות, לנהל את הנכסים, לעקוב אחר תנועות משתמשים דרכם, לאסוף מידע על בסיס המשתמשים בכללותו, ולקשר מידע שנאסף באופן אוטומטי למידע אישי למטרות עסקיות לגיטימיות, כגון איתור ומניעת פעילות הונאה, וכן למטרות אחרות.', 'כאשר שירותים של א.ד.י. מתקבלים אצל המשתמש דרך ו/או באמצעות הנכסים, אפשר ותהיה הפנייה ל"ספקים-צד שלישי" (לדוגמה, ספקי שירות תשלומים, כולל כרטיס אשראי או ספקי תשלום מקוונים ו/או שירותי מיקום, ספק שירותי תמיכה במערכות האבטחה ומערכות טכנולוגיית מידע (IT), ספק שירותי אחסון מידע, ספק שירותי סליקה, ספק שירותי בניית אתרים, ספק שירותי עריכת סקרים ומחקרים, חברות שליחויות, ספק לוגיסטיקה, ספק שירותי פרסום ושיווק, עורכי דין או יועצים מקצועיים חיצוניים אחרים וכן צדדים שלישיים נוספים אשר מעניקים ל-א.ד.י. שירותים בקשר עם פעילותה, וכיו"ב). כאשר א.ד.י משתמשת ב"ספקים-צד שלישי" היא מסתמכת על ספק השירות שמעבד את המידע האישי.', 'א.ד.י. תהיה רשאית להעביר לצד שלישי את המידע האישי של המשתמש במקרה של מיזוג, שינוי שליטה, רכישה או העברת הפעילות של א.ד.י לצד שלישי. העברת המידע האישי בנסיבות אלה תהיה כפופה לכך שמקבל המידע יפעל בהתאם למדיניות כהגדרתה לעיל.', 'יתכנו מצבים בהם א.ד.י. תידרש להעביר את המידע האישי של המשתמש למטרות שתוארו לעיל לצדדים שלישיים, וא.ד.י תהא רשאית לעשות כן בנסיבות הבאות: אם העברת המידע נחוצה לשם פעילות המשתמש בנכסים; אם א.ד.י. נדרשת לעשות זאת על פי כל דין ו/או החוק החל, צו בית המשפט או רגולציה אחרת; או אם העברת המידע אושרה בדרך אחרת ו/או נדרשת בכל חקירה פלילית או משפטית או בכל הליך משפטי או במקרה שהמשתמש פעל בנכסים בניגוד לדין. בנוסף א.ד.י. תהיה רשאית להעביר לצד שלישי את המידע האישי של המשתמש בכל מחלוקת, טענה, דרישה, תביעה או הליכים משפטיים כלשהם בין המשתמש או מי מטעמו לבין א.ד.י. ומי מטעמה.', 'אם תועלה טענה או יתעורר אצל א.ד.י. חשד שהמשתמש ביצע מעשה או מחדל שעשויים לפגוע בה, במי מטעמה, ובצדדים שלישיים כלשהם, לרבות משתמשים אחרים, וכן אם תועלה טענה או יתעורר אצל א.ד.י. חשד שמשתמש עושה שימוש בנכסים לצורך ביצוע מעשה בלתי חוקי או כדי לאפשר, להקל, לסייע, לעודד את ביצועו של מעשה כזה — א.ד.י. תהיה רשאית להעביר את המידע האישי של המשתמש לצד שלישי. כמו כן היא תהיה רשאית לעשות זאת במקרה שתסבור כי מסירת המידע האישי נדרשת כדי למנוע נזק לה, למשתמש או לצד שלישי כלשהו.', 'א.ד.י. וכל מי מטעמה לא יישאו בכל חבות, והם פטורים מכל אחריות, בקשר עם כל נזק, הפסד והוצאה, מכל מין וסוג שהם, בין אם ישירים ובין אם עקיפים, נסיבתיים ותוצאתיים, אשר ייגרמו למשתמש ולצד שלישי בכל הקשור והנוגע ל"ספק-צד שלישי" ולצד שלישי אחר, לרבות בכל הקשור לאיסוף המידע על ידי "ספק-צד שלישי" וצד שלישי אחר, השימוש בו, העברתו לצדדים נוספים, שמירתו, אבטחתו ועוד.']],
+    ['ההגנה על המידע האישי של המשתמש ופרטיותו', ['א.ד.י נוקטת בכל האמצעים הטכניים והארגוניים המקובלים כדי למזער סיכונים ו/או להגן על המידע האישי של המשתמש מפני אובדן, חשיפה, שינוי, פגיעה, גניבה או גישה של צדדים שלישיים בלתי מורשים.', 'א.ד.י. לא תמכור, תשתף, תעביר או תשתמש בנתונים שהיא אוספת למטרות אחרות מאלה המפורטות במפורש במדיניות זאת.', 'א.ד.י. תמחק את המידע האישי של המשתמש כאשר המטרה העסקית שעבורה נאסף או מעובד המידע הסתיימה, או אם כללי הגנת המידע (על-פי הדין) יחייבו אותה למחוק מידע אישי זה.', 'יחד עם זאת, אין וודאות שכל האמצעים בהם א.ד.י. נוקטת להגנה על המידע האישי ימנעו גישה ו/או חדירה בלתי-מורשית לנכסים ו/או למידע האישי מצד צדדים שלישיים לא מורשים. מדובר במזעור סיכונים בלבד, וא.ד.י לא מתחייבת שהמידע האישי ו/או שירותיה ו/או הנכסים יהיו חסינים באופן מוחלט בפני גישה בלתי-מורשית. המשתמש מוסר את המידע האישי בהסכמה מלאה ובמודעות לסכנות הכרוכות בהעברת המידע באמצעות הנכסים.', 'א.ד.י. וכל מי מטעמה לא ישאו בכל חבות ויהיו פטורים מכל אחריות בקשר לכל נזק, הפסד, הוצאה ואובדן, עקיפים וישירים, נסיבתיים ותוצאתיים, שייגרמו למשתמש ולצד שלישי בכל הקשור והנוגע לאיסוף המידע, השימוש בו, העברתו לצדדים שלישיים, שמירתו ואבטחתו, כולל אלה הנובעים מחדירה ו/או גישה בלתי מורשית למידע האישי ו/או משימוש לא נאות ו/או מכל מחדל ו/או הפרה של פעולות אבטחה המביא/ה להרס, אובדן, שינוי, גילוי או גישה בלתי מורשית של המידע אישי של המשתמש.', 'אם המשתמש יספק מידע אישי לא.ד.י. בקשר לאנשים אחרים, לרבות בני משפחתו, הוא יעשה זאת רק לאחר שהמשתמש עדכן אותם בדבר המדיניות, וקיבל את הסכמתם למדיניות.']],
+    ['זכויות המשתמש', ['מסירת המידע האישי של המשתמש לא.ד.י. תלויה ברצונו ובהסכמתו של המשתמש, ולא חלה עליו חובה חוקית למסור אותו לא.ד.י. השימוש בשירותים שמציעה א.ד.י. מעידים על הסכמתו של המשתמש למדיניות ולכך שהמידע יישמר וינוהל בהתאם למדיניות. אלא אם היא מורשית או מחויבת חוקית לבצע איסוף/עיבוד כאמור גם מבלי שניתנה הסכמה מצד המשתמש.', 'אם המשתמש לא מסכים למסור את המידע לא.ד.י., ייתכן שהיא לא תוכל לספק לו את כל השירותים שהיא מציעה או את חלקם.', 'המשתמש רשאי לבטל או למשוך את הסכמתו הנ"ל בכל עת וכן לבקש לעיין במידע האישי שא.ד.י אספה/עיבדה ולבקש לתקנו או למחוק אותו (כולו או חלקו) – הכול באמצעות שליחת בקשה לא.ד.י. א.ד.י. תפעל בהתאם לבקשת המשתמש בתוך 30 יום, אלא אם כן היא מחויבת ו/או מורשית על פי כל דין לשמור על המידע ו/או באם יש לה אינטרס לגיטימי כלשהו (על-פי דין) שלא לעשות כן ובכפוף לשיקולים טכניים.']],
+  ]) + `
+    <p class="text-sm text-neutral-500">המדיניות כתובה בלשון זכר-יחיד רק מטעמי נוחות. יש לראות בכתוב כמתייחס גם ללשון נקבה וללשון רבים/רבות.</p>
+  </div>`);
+}
+const LEGAL = { accessibility: renderAccessibility, terms: renderTerms, privacy: renderPrivacy };
+
+// ───── Accessibility widget (same options as the Kia site; remembered per device) ─────
+const A11Y_KEY = 'a11y_settings';
+const a11yDefaults = { fontScale: 0, highContrast: false, highlightLinks: false, readableFont: false, reducedMotion: false };
+const a11yToggles = [['highContrast', 'ניגודיות גבוהה'], ['highlightLinks', 'הדגשת קישורים'], ['readableFont', 'גופן קריא'], ['reducedMotion', 'ביטול אנימציות']];
+let a11y = { ...a11yDefaults };
+try { a11y = { ...a11yDefaults, ...JSON.parse(localStorage.getItem(A11Y_KEY) || '{}') }; } catch {}
+function applyA11y() {
+  const html = document.documentElement;
+  html.style.setProperty('--a11y-font-scale', String([1, 1.125, 1.25, 1.5, 1.75][a11y.fontScale] ?? 1));
+  html.classList.toggle('a11y-high-contrast', a11y.highContrast);
+  html.classList.toggle('a11y-highlight-links', a11y.highlightLinks);
+  html.classList.toggle('a11y-readable-font', a11y.readableFont);
+  html.classList.toggle('a11y-reduced-motion', a11y.reducedMotion);
+  document.getElementById('a11yFont').textContent = [100, 112.5, 125, 150, 175][a11y.fontScale] + '%';
+  document.querySelector('[data-a11y="font-"]').disabled = a11y.fontScale === 0;
+  document.querySelector('[data-a11y="font+"]').disabled = a11y.fontScale === 4;
+  document.getElementById('a11yToggles').innerHTML = a11yToggles.map(([k, label]) => `
+    <button data-a11y="${k}" role="switch" aria-checked="${a11y[k]}" class="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm transition-colors ${a11y[k] ? 'border-blue-300 bg-blue-50 text-blue-900' : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50'}">
+      <span>${label}</span>
+      <span class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${a11y[k] ? 'bg-blue-600' : 'bg-neutral-300'}" dir="ltr"><span class="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${a11y[k] ? 'translate-x-5' : 'translate-x-0.5'}"></span></span>
+    </button>`).join('');
+  try { localStorage.setItem(A11Y_KEY, JSON.stringify(a11y)); } catch {}
+}
+applyA11y();
+const a11yPanel = document.getElementById('a11yPanel');
+document.addEventListener('click', e => {
+  if (e.target.closest('#a11yBtn')) { a11yPanel.classList.toggle('hidden'); return; }
+  if (e.target.closest('#a11yClose') || e.target.closest('#a11yPanel a')) { a11yPanel.classList.add('hidden'); return; }
+  const b = e.target.closest('[data-a11y]');
+  if (!b) return;
+  const k = b.dataset.a11y;
+  if (k === 'font-') a11y.fontScale = Math.max(0, a11y.fontScale - 1);
+  else if (k === 'font+') a11y.fontScale = Math.min(4, a11y.fontScale + 1);
+  else if (k === 'reset') a11y = { ...a11yDefaults };
+  else a11y[k] = !a11y[k];
+  applyA11y();
+});
 
 // ───── Hamburger menu ─────
 const drawer = document.getElementById('drawer'), scrim = document.getElementById('scrim');
@@ -412,8 +588,35 @@ function copySku(sku, btn) {
 function closeSheet() {
   modal.classList.replace('flex', 'hidden');
   document.getElementById('sheetBody').innerHTML = '';
-  document.body.style.overflow = '';
+  if (itemModal.classList.contains('hidden')) document.body.style.overflow = '';
 }
+
+// ───── Product window: floats over the home page (like the Kia product popup) ─────
+const itemModal = document.createElement('div');
+itemModal.id = 'itemModal';
+itemModal.className = 'fixed inset-0 z-[45] hidden items-center justify-center bg-black/60 p-2 backdrop-blur-[2px] sm:p-6';
+itemModal.setAttribute('role', 'dialog');
+itemModal.setAttribute('aria-modal', 'true');
+document.body.appendChild(itemModal);
+function openItem(slug) {
+  itemModal.innerHTML = `
+    <div class="relative max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+      <button id="itemClose" class="absolute left-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-xl text-neutral-700 hover:bg-neutral-200" aria-label="סגירה">✕</button>
+      ${renderItem(slug, true)}
+    </div>`;
+  itemModal.classList.replace('hidden', 'flex');
+  itemModal.firstElementChild.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+function closeItem() {
+  if (itemModal.classList.contains('hidden')) return;
+  itemModal.classList.replace('flex', 'hidden');
+  itemModal.innerHTML = '';
+  document.body.style.overflow = '';
+  document.title = 'אדי × טרייד מוביל';
+}
+// Closing the window goes back to the home page, keeping the scroll position
+function leaveItem() { history.replaceState(null, '', '#home'); closeItem(); }
 
 document.addEventListener('click', e => {
   const cp = e.target.closest('[data-copy]');
@@ -428,6 +631,7 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-sheet]');
   if (b) return openSheet(b.dataset.sheet, b.dataset.title);
   if (e.target === modal || e.target.closest('#sheetClose')) return closeSheet();
+  if (e.target === itemModal || e.target.closest('#itemClose')) return leaveItem();
   if (e.target.closest('#menuBtn')) return openMenu();
   if (e.target === scrim || e.target.closest('#menuClose')) return closeMenu();
   const s = e.target.closest('[data-scroll]');
@@ -439,14 +643,26 @@ document.addEventListener('click', e => {
   }
   if (e.target.closest('#drawer a')) closeMenu();
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSheet(); closeMenu(); } });
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (modal.classList.contains('flex')) closeSheet(); else leaveItem();
+  closeMenu();
+});
 
 function route() {
   const h = location.hash.slice(1);
   closeMenu();
   const app = document.getElementById('app');
-  app.innerHTML = h === 'reps' ? renderReps() : h.startsWith('p-') ? renderItem(h.slice(2)) : renderHome();
-  window.scrollTo(0, 0);
+  const onHome = !!app.querySelector('#products');
+  if (h.startsWith('p-') && items.some(x => x.slug === h.slice(2))) {
+    if (!onHome) { app.innerHTML = renderHome(); window.scrollTo(0, 0); }
+    openItem(h.slice(2));
+    return;
+  }
+  closeItem();
+  if (h === 'reps') { app.innerHTML = renderReps(); window.scrollTo(0, 0); return; }
+  if (LEGAL[h]) { app.innerHTML = LEGAL[h](); window.scrollTo(0, 0); return; }
+  if (!onHome) { app.innerHTML = renderHome(); window.scrollTo(0, 0); }
 }
 window.addEventListener('hashchange', route);
 route();
