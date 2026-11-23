@@ -78,6 +78,8 @@
       <a href="#terms" class="transition-colors hover:text-neutral-600 hover:underline">תקנון</a>
       <span class="text-neutral-300">·</span>
       <a href="#privacy" class="transition-colors hover:text-neutral-600 hover:underline">מדיניות פרטיות</a>
+      <span class="text-neutral-300">·</span>
+      <button type="button" id="cookiePrefsLink" class="transition-colors hover:text-neutral-600 hover:underline">ניהול עוגיות</button>
     </div>
   </div>
 </footer>
@@ -107,6 +109,9 @@
     </div>
   </div>
 </div>
+
+<!-- Cookie consent banner + preferences (same as the Kia site) -->
+<div id="cookieRoot"></div>
 
 <!-- Product-sheet viewer -->
 <div id="sheet" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 p-3 sm:p-6">
@@ -429,6 +434,15 @@ const legalShell = (title, sub, body) => `
   </div>`;
 const h2 = t => `<h2 class="mb-3 text-xl font-bold text-neutral-900 sm:text-2xl">${t}</h2>`;
 const ul = arr => `<ul class="space-y-2.5 text-base leading-relaxed text-neutral-700">${arr.map(li).join('')}</ul>`;
+const contactBox = (title, intro) => `
+  <section class="mt-10 border-t border-neutral-100 pt-8">${h2(title)}
+    <p class="mb-3 text-base leading-relaxed text-neutral-700">${intro}</p>
+    <div class="space-y-2 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-base text-neutral-700 sm:p-6">
+      <p><span class="font-semibold text-neutral-900">טלפון:</span> <a href="tel:1700704100" class="text-blue-600 hover:underline" dir="ltr">1-700-704-100</a> <span class="text-neutral-400">|</span> <a href="tel:039629296" class="text-blue-600 hover:underline" dir="ltr">03-9629296</a></p>
+      <p><span class="font-semibold text-neutral-900">פקס:</span> <span dir="ltr">03-9292967</span></p>
+      <p><span class="font-semibold text-neutral-900">דוא״ל:</span> <a href="mailto:maindesk@adi-system.co.il" class="text-blue-600 hover:underline" dir="ltr">maindesk@adi-system.co.il</a></p>
+    </div>
+  </section>`;
 const numbered = secs => `<div class="mt-10 space-y-8">${secs.map(([t, items], i) => `<section>${h2(`${i + 1}. ${t}`)}${ul(items)}</section>`).join('')}`;
 
 function renderAccessibility() {
@@ -447,6 +461,13 @@ function renderAccessibility() {
       <ul class="space-y-3 text-base leading-relaxed text-neutral-700">
         <li><strong class="text-neutral-900">הדרכות עובדים לשירות נגיש</strong> – מתקיימות הדרכות להכרת תחום הנגישות, יצירת מודעות בקרב העובדים והקניית כלים מעשיים למתן שירות נגיש.</li>
         <li><strong class="text-neutral-900">מוקד טלפוני נגיש</strong> – המענה הקולי הונגש כך שהמידע מועבר בשפה ברורה וללא מוסיקת רקע.</li>
+        <li>ניתן ליצור קשר עם מרכז שירות הלקוחות בטלפון <a href="tel:1700704100" class="font-semibold text-blue-600 hover:underline" dir="ltr">1-700-704-100</a> בימים א׳-ה׳ בין השעות <span dir="ltr">08:00–17:00</span>.</li>
+      </ul>
+      <h3 class="mb-3 mt-6 text-base font-bold text-neutral-900">אמצעים נוספים ליצירת קשר:</h3>
+      <ul class="space-y-2.5 text-base leading-relaxed text-neutral-700">
+        ${li('<strong>טלפון</strong> – <a href="tel:039629296" class="text-blue-600 hover:underline" dir="ltr">03-9629296</a>')}
+        ${li('<strong>פקס</strong> – <span dir="ltr">03-9292967</span>')}
+        ${li('<strong>דואר אלקטרוני</strong> – <a href="mailto:maindesk@adi-system.co.il" class="text-blue-600 hover:underline" dir="ltr">maindesk@adi-system.co.il</a>')}
       </ul>
     </section>
     <section class="mt-10">${h2('נגישות אתר האינטרנט')}
@@ -463,6 +484,16 @@ function renderAccessibility() {
         <p>יש לציין כי אנו ממשיכים במאמצים לשפר את נגישות החברה כחלק ממחויבותנו לאפשר לכלל האוכלוסייה, כולל אנשים עם מוגבלויות, לקבל את השירות הנגיש ביותר.</p>
         <p>במידה ונתקלת בבעיה או בתקלה כלשהי בנושא הנגישות, נשמח שתעדכן אותנו, ואנו נעשה כל מאמץ למצוא עבורך פתרון מתאים ולטפל בתקלה בהקדם ככל שניתן.</p>
       </div>
+    </section>
+    <section class="mt-10">${h2('פניות בנושא נגישות')}
+      <div class="rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-base leading-relaxed text-neutral-700 sm:p-6">
+        <p class="mb-3">לפניות, הערות ובקשות בנושא נגישות ניתן לפנות אל:</p>
+        <dl class="space-y-1.5">
+          <div class="flex gap-2"><dt class="font-semibold text-neutral-900">שם:</dt><dd>ליאור צדקיהו</dd></div>
+          <div class="flex gap-2"><dt class="font-semibold text-neutral-900">טלפון:</dt><dd><a href="tel:1700704100" class="text-blue-600 hover:underline" dir="ltr">1-700-704-100</a></dd></div>
+          <div class="flex gap-2"><dt class="font-semibold text-neutral-900">דוא״ל:</dt><dd><a href="mailto:liort@adi-system.co.il" class="text-blue-600 hover:underline" dir="ltr">liort@adi-system.co.il</a></dd></div>
+        </dl>
+      </div>
     </section>`);
 }
 
@@ -477,7 +508,7 @@ function renderTerms() {
     ['קניין רוחני', ['בכפוף לדין החל על קניין רוחני בישראל, זכויות הקניין הרוחני, לרבות זכויות יוצרים, פטנטים, סימני מסחר וסודות מסחריים, באתר, בעיצובו ובתוכנו וכיו"ב, בבעלות העסק, לפי העניין. אין להעתיק, לשכפל, להפיץ כל חומר מתוך האתר ללא אישור בכתב של העסק.']],
     ['הגבלת אחריות', ['תוכן האתר ו/או השימוש בו אינם יכולים לשמש בסיס לצורך קבלת החלטות עסקיות, כספיות, משפטיות, אישיות ו/או אחרות. כל פעולה שנעשית על-ידך בהתבסס על תוכן האתר נעשית לפי שיקול דעתך ובאחריותך בלבד.', 'האתר ותוכנו ניתנים לשימוש AS IS ללא כל התחייבות או אחריות העסק ו/או מי מטעמו לתוכן וידוע לך שחלק מהתוכן מקורו בצדדי ג\' שלעסק ו/או למי מטעמו אין ולא יכולה להיות שליטה עליהם.', 'בשום מקרה לא תהיה לעסק ו/או מי מטעמו אחריות כלפיך או כלפי צד שלישי כלשהו, במישרין או בעקיפין, עבור כל אובדן, נזק, הפסד, או לכל נזק ישיר ו/או עקיף הנובע מצדדי ג\' שלעסק ו/או מי מטעמו אין ולא יכולה להיות שליטה עליהם.', 'האחריות הניתנת למוצרים היא כמפורט בתעודת האחריות הרלוונטית.', 'התמונות באתר הן להמחשה בלבד.']],
     ['דין ושיפוט', ['מבלי לגרוע מהאמור, על כל שימוש באתר ו/או כל תביעה, דרישה או בקשה הנובעים ממנו ו/או מכל דבר ועניין אחר הקשורים באופן ישיר או עקיף לאתר זה ו/או לשירותים המסופקים על ידי העסק במסגרתו יחולו דיני מדינת ישראל בלבד. מקום השיפוט יהיה בבית המשפט לו הסמכות במחוז המרכז והדין המהותי והפרוצדוראלי שיחול יהיה הדין הישראלי.']],
-  ]) + `</div>`);
+  ]) + contactBox('9. יצירת קשר', 'בכל שאלה או בעיה הנוגעים לשימוש באתר ניתן לפנות אל העסק:') + `</div>`);
 }
 
 function renderPrivacy() {
@@ -489,8 +520,8 @@ function renderPrivacy() {
     ['סוגי המידע האישי שנאסף ומטרות האיסוף והעיבוד', ['המידע האישי של המשתמש שנאסף ו/או מעובד ו/או שבו נעשה שימוש, מוגבל למידע הנחוץ לא.ד.י. כדי לספק למשתמש שירותים במהלך עסקיה, תוך הגנה על המידע וקיום חובות המוטלות על א.ד.י. על-פי דין בקשר לכך. הגישה למידע, הכוללת גם גישה פיזית, מוגבלת לעובדים ולצדדים שלישיים המתקשרים עם א.ד.י., והם משתמשים בו למטרות המפורטות להלן בלבד.', 'המידע שנאסף ומעובד כולל גם מידע כללי המשמש למטרות טכניות ובהתאם לשירותים שא.ד.י. תבחר ותשתמש בהם.', 'עשוי להיות עיבוד ואחסון אוטומטי של מידע אישי של המשתמש. מידע זה כולל גם כתובות IP, סוג הדפדפן, ספק שירותי האינטרנט, דפי הפניה ויציאה, מערכות הפעלה, חותמת תאריך / שעה ונתונים של הקלקות, וא.ד.י עשויה להשתמש בו כדי לנתח מגמות, לנהל את הנכסים, לעקוב אחר תנועות משתמשים דרכם, לאסוף מידע על בסיס המשתמשים בכללותו, ולקשר מידע שנאסף באופן אוטומטי למידע אישי למטרות עסקיות לגיטימיות, כגון איתור ומניעת פעילות הונאה, וכן למטרות אחרות.', 'כאשר שירותים של א.ד.י. מתקבלים אצל המשתמש דרך ו/או באמצעות הנכסים, אפשר ותהיה הפנייה ל"ספקים-צד שלישי" (לדוגמה, ספקי שירות תשלומים, כולל כרטיס אשראי או ספקי תשלום מקוונים ו/או שירותי מיקום, ספק שירותי תמיכה במערכות האבטחה ומערכות טכנולוגיית מידע (IT), ספק שירותי אחסון מידע, ספק שירותי סליקה, ספק שירותי בניית אתרים, ספק שירותי עריכת סקרים ומחקרים, חברות שליחויות, ספק לוגיסטיקה, ספק שירותי פרסום ושיווק, עורכי דין או יועצים מקצועיים חיצוניים אחרים וכן צדדים שלישיים נוספים אשר מעניקים ל-א.ד.י. שירותים בקשר עם פעילותה, וכיו"ב). כאשר א.ד.י משתמשת ב"ספקים-צד שלישי" היא מסתמכת על ספק השירות שמעבד את המידע האישי.', 'א.ד.י. תהיה רשאית להעביר לצד שלישי את המידע האישי של המשתמש במקרה של מיזוג, שינוי שליטה, רכישה או העברת הפעילות של א.ד.י לצד שלישי. העברת המידע האישי בנסיבות אלה תהיה כפופה לכך שמקבל המידע יפעל בהתאם למדיניות כהגדרתה לעיל.', 'יתכנו מצבים בהם א.ד.י. תידרש להעביר את המידע האישי של המשתמש למטרות שתוארו לעיל לצדדים שלישיים, וא.ד.י תהא רשאית לעשות כן בנסיבות הבאות: אם העברת המידע נחוצה לשם פעילות המשתמש בנכסים; אם א.ד.י. נדרשת לעשות זאת על פי כל דין ו/או החוק החל, צו בית המשפט או רגולציה אחרת; או אם העברת המידע אושרה בדרך אחרת ו/או נדרשת בכל חקירה פלילית או משפטית או בכל הליך משפטי או במקרה שהמשתמש פעל בנכסים בניגוד לדין. בנוסף א.ד.י. תהיה רשאית להעביר לצד שלישי את המידע האישי של המשתמש בכל מחלוקת, טענה, דרישה, תביעה או הליכים משפטיים כלשהם בין המשתמש או מי מטעמו לבין א.ד.י. ומי מטעמה.', 'אם תועלה טענה או יתעורר אצל א.ד.י. חשד שהמשתמש ביצע מעשה או מחדל שעשויים לפגוע בה, במי מטעמה, ובצדדים שלישיים כלשהם, לרבות משתמשים אחרים, וכן אם תועלה טענה או יתעורר אצל א.ד.י. חשד שמשתמש עושה שימוש בנכסים לצורך ביצוע מעשה בלתי חוקי או כדי לאפשר, להקל, לסייע, לעודד את ביצועו של מעשה כזה — א.ד.י. תהיה רשאית להעביר את המידע האישי של המשתמש לצד שלישי. כמו כן היא תהיה רשאית לעשות זאת במקרה שתסבור כי מסירת המידע האישי נדרשת כדי למנוע נזק לה, למשתמש או לצד שלישי כלשהו.', 'א.ד.י. וכל מי מטעמה לא יישאו בכל חבות, והם פטורים מכל אחריות, בקשר עם כל נזק, הפסד והוצאה, מכל מין וסוג שהם, בין אם ישירים ובין אם עקיפים, נסיבתיים ותוצאתיים, אשר ייגרמו למשתמש ולצד שלישי בכל הקשור והנוגע ל"ספק-צד שלישי" ולצד שלישי אחר, לרבות בכל הקשור לאיסוף המידע על ידי "ספק-צד שלישי" וצד שלישי אחר, השימוש בו, העברתו לצדדים נוספים, שמירתו, אבטחתו ועוד.']],
     ['ההגנה על המידע האישי של המשתמש ופרטיותו', ['א.ד.י נוקטת בכל האמצעים הטכניים והארגוניים המקובלים כדי למזער סיכונים ו/או להגן על המידע האישי של המשתמש מפני אובדן, חשיפה, שינוי, פגיעה, גניבה או גישה של צדדים שלישיים בלתי מורשים.', 'א.ד.י. לא תמכור, תשתף, תעביר או תשתמש בנתונים שהיא אוספת למטרות אחרות מאלה המפורטות במפורש במדיניות זאת.', 'א.ד.י. תמחק את המידע האישי של המשתמש כאשר המטרה העסקית שעבורה נאסף או מעובד המידע הסתיימה, או אם כללי הגנת המידע (על-פי הדין) יחייבו אותה למחוק מידע אישי זה.', 'יחד עם זאת, אין וודאות שכל האמצעים בהם א.ד.י. נוקטת להגנה על המידע האישי ימנעו גישה ו/או חדירה בלתי-מורשית לנכסים ו/או למידע האישי מצד צדדים שלישיים לא מורשים. מדובר במזעור סיכונים בלבד, וא.ד.י לא מתחייבת שהמידע האישי ו/או שירותיה ו/או הנכסים יהיו חסינים באופן מוחלט בפני גישה בלתי-מורשית. המשתמש מוסר את המידע האישי בהסכמה מלאה ובמודעות לסכנות הכרוכות בהעברת המידע באמצעות הנכסים.', 'א.ד.י. וכל מי מטעמה לא ישאו בכל חבות ויהיו פטורים מכל אחריות בקשר לכל נזק, הפסד, הוצאה ואובדן, עקיפים וישירים, נסיבתיים ותוצאתיים, שייגרמו למשתמש ולצד שלישי בכל הקשור והנוגע לאיסוף המידע, השימוש בו, העברתו לצדדים שלישיים, שמירתו ואבטחתו, כולל אלה הנובעים מחדירה ו/או גישה בלתי מורשית למידע האישי ו/או משימוש לא נאות ו/או מכל מחדל ו/או הפרה של פעולות אבטחה המביא/ה להרס, אובדן, שינוי, גילוי או גישה בלתי מורשית של המידע אישי של המשתמש.', 'אם המשתמש יספק מידע אישי לא.ד.י. בקשר לאנשים אחרים, לרבות בני משפחתו, הוא יעשה זאת רק לאחר שהמשתמש עדכן אותם בדבר המדיניות, וקיבל את הסכמתם למדיניות.']],
     ['זכויות המשתמש', ['מסירת המידע האישי של המשתמש לא.ד.י. תלויה ברצונו ובהסכמתו של המשתמש, ולא חלה עליו חובה חוקית למסור אותו לא.ד.י. השימוש בשירותים שמציעה א.ד.י. מעידים על הסכמתו של המשתמש למדיניות ולכך שהמידע יישמר וינוהל בהתאם למדיניות. אלא אם היא מורשית או מחויבת חוקית לבצע איסוף/עיבוד כאמור גם מבלי שניתנה הסכמה מצד המשתמש.', 'אם המשתמש לא מסכים למסור את המידע לא.ד.י., ייתכן שהיא לא תוכל לספק לו את כל השירותים שהיא מציעה או את חלקם.', 'המשתמש רשאי לבטל או למשוך את הסכמתו הנ"ל בכל עת וכן לבקש לעיין במידע האישי שא.ד.י אספה/עיבדה ולבקש לתקנו או למחוק אותו (כולו או חלקו) – הכול באמצעות שליחת בקשה לא.ד.י. א.ד.י. תפעל בהתאם לבקשת המשתמש בתוך 30 יום, אלא אם כן היא מחויבת ו/או מורשית על פי כל דין לשמור על המידע ו/או באם יש לה אינטרס לגיטימי כלשהו (על-פי דין) שלא לעשות כן ובכפוף לשיקולים טכניים.']],
-  ]) + `
-    <p class="text-sm text-neutral-500">המדיניות כתובה בלשון זכר-יחיד רק מטעמי נוחות. יש לראות בכתוב כמתייחס גם ללשון נקבה וללשון רבים/רבות.</p>
+  ]) + contactBox('יצירת קשר', 'לשאלות בנוגע למדיניות, או לבקשה לעיין במידע, לתקן אותו או למחוק אותו, ניתן לפנות אל א.ד.י:') + `
+    <p class="mt-6 text-sm text-neutral-500">המדיניות כתובה בלשון זכר-יחיד רק מטעמי נוחות. יש לראות בכתוב כמתייחס גם ללשון נקבה וללשון רבים/רבות.</p>
   </div>`);
 }
 const LEGAL = { accessibility: renderAccessibility, terms: renderTerms, privacy: renderPrivacy };
@@ -533,6 +564,148 @@ document.addEventListener('click', e => {
   applyA11y();
 });
 
+// ───── Cookie consent (same flow + texts as the Kia site) ─────
+// Stored in a first-party cookie for 12 months. Analytics may fire only if hasConsentFor('statistics').
+const CONSENT_COOKIE = 'cookie_consent', CONSENT_VERSION = 1;
+function getConsent() {
+  try {
+    const m = document.cookie.match(new RegExp(`(?:^|;\\s*)${CONSENT_COOKIE}=([^;]+)`));
+    if (!m) return null;
+    const c = JSON.parse(decodeURIComponent(m[1]));
+    return c && c.version === CONSENT_VERSION && typeof c.statistics === 'boolean' ? c : null;
+  } catch { return null; }
+}
+function setConsent(statistics, marketing) {
+  const state = { functional: true, statistics, marketing, version: CONSENT_VERSION, decidedAt: new Date().toISOString() };
+  document.cookie = [`${CONSENT_COOKIE}=${encodeURIComponent(JSON.stringify(state))}`, 'path=/', `max-age=${60 * 60 * 24 * 365}`, 'samesite=lax',
+    location.protocol === 'https:' ? 'secure' : ''].filter(Boolean).join('; ');
+  window.dispatchEvent(new CustomEvent('cookie-consent-changed', { detail: state }));
+}
+const hasConsentFor = cat => !!(getConsent() || {})[cat];
+
+const cookieRoot = document.getElementById('cookieRoot');
+const COOKIE_TEXT = 'האתר שלנו משתמש בעוגיות (Cookies) כדי לשפר את חוויית הגלישה, לנתח את השימוש באתר ולהתאים עבורך תוכן ושירות. באפשרותך לבחור לאשר את כל העוגיות או להגדיר את ההעדפות שלך.';
+const cookieIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01M16 15.5v.01M12 12v.01M11 17v.01M7 14v.01"/></svg>';
+const btnGhost = 'rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50';
+const btnMain = 'rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700';
+const cookieActions = extra => `${extra}
+  <button type="button" data-cookie="reject" class="${btnGhost}">דחה עוגיות לא חיוניות</button>
+  <button type="button" data-cookie="all" class="${btnMain}">מאשר את כל העוגיות</button>`;
+let cookiePrefs = { statistics: false, marketing: false };
+const cookieSwitch = key => `<button type="button" data-cookie="toggle" data-key="${key}" role="switch" aria-checked="${cookiePrefs[key]}" dir="ltr"
+  class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${cookiePrefs[key] ? 'bg-emerald-500' : 'bg-neutral-300'}">
+  <span class="inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${cookiePrefs[key] ? 'translate-x-6' : 'translate-x-1'}"></span></button>`;
+const cookieCat = (key, title, text) => `
+  <div class="p-4 sm:p-5">
+    <div class="flex items-center justify-between gap-3">
+      <button type="button" data-cookie="details" class="flex items-center gap-2 text-right font-semibold" aria-expanded="false"><span class="text-xs text-neutral-400">▼</span>${title}</button>
+      ${cookieSwitch(key)}
+    </div>
+    <p class="mt-2 hidden text-xs leading-relaxed text-neutral-500">${text}</p>
+  </div>`;
+
+function renderCookieBanner() {
+  cookieRoot.innerHTML = `
+  <div class="pointer-events-none fixed inset-x-0 bottom-0 z-[9998] flex justify-center p-3 sm:p-4" style="padding-bottom:calc(.75rem + env(safe-area-inset-bottom, 0px))">
+    <div class="pointer-events-auto w-full max-w-2xl rounded-xl border border-neutral-200 bg-white p-4 shadow-2xl sm:p-5" role="region" aria-label="שימוש בעוגיות">
+      <div class="flex items-start gap-3">
+        <div class="shrink-0 rounded-lg bg-amber-50 p-2 text-amber-600">${cookieIcon}</div>
+        <div class="min-w-0 flex-1">
+          <h2 class="mb-1 text-base font-bold sm:text-lg">שימוש בעוגיות</h2>
+          <p class="text-sm leading-relaxed text-neutral-600">${COOKIE_TEXT}</p>
+        </div>
+        <button type="button" data-cookie="reject" aria-label="דחה ועצור עוגיות לא חיוניות" class="shrink-0 rounded-md p-1 text-xl leading-none text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600">✕</button>
+      </div>
+      <div class="mt-4 flex flex-wrap items-center justify-end gap-2">${cookieActions(`<button type="button" data-cookie="prefs" class="${btnGhost}">נהל העדפות</button>`)}</div>
+    </div>
+  </div>`;
+}
+function renderCookiePrefs() {
+  cookieRoot.innerHTML = `
+  <div class="fixed inset-0 z-[9999] flex items-end justify-center bg-black/50 p-3 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="cookiePrefsTitle">
+    <div class="flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
+      <div class="flex items-start gap-3 border-b border-neutral-200 p-4 sm:p-5">
+        <div class="min-w-0 flex-1">
+          <h2 id="cookiePrefsTitle" class="mb-1 text-base font-bold sm:text-lg">שימוש בעוגיות</h2>
+          <p class="text-sm leading-relaxed text-neutral-600">${COOKIE_TEXT}</p>
+        </div>
+        <button type="button" data-cookie="close" aria-label="סגור" class="shrink-0 rounded-md p-1 text-xl leading-none text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600">✕</button>
+      </div>
+      <div class="flex-1 divide-y divide-neutral-200 overflow-y-auto">
+        <div class="p-4 sm:p-5">
+          <div class="mb-2 flex items-center justify-between gap-3"><span class="font-semibold">פונקציונלי</span><span class="text-xs font-medium text-emerald-600">פעיל תמיד</span></div>
+          <p class="text-xs leading-relaxed text-neutral-500">עוגיות חיוניות לפעולת האתר — שמירת הבחירות שלך בנושא עוגיות והגדרות הנגישות. ניתן לחסום אותן רק ברמת הדפדפן ויידרש לכך שינוי הגדרות.</p>
+        </div>
+        ${cookieCat('statistics', 'סטטיסטיקה', 'עוגיות אלו עוזרות לנו להבין איך משתמשים גולשים באתר — אילו דפים נצפים, כמה זמן נשארים, וזה ניתן לעיבוד מצטבר (ולא ברמת זהות אישית). המידע נאסף באופן אנונימי ומשמש לשיפור חוויית המשתמש.')}
+        ${cookieCat('marketing', 'שיווק', 'עוגיות שיווק (לא בשימוש כיום באתר זה, נשמרות כהעדפה לעתיד) משמשות להצגת מודעות מותאמות אישית ומדידת אפקטיביות של קמפיינים שיווקיים.')}
+      </div>
+      <div class="flex flex-wrap items-center justify-end gap-2 border-t border-neutral-200 p-4 sm:p-5">${cookieActions(`<button type="button" data-cookie="save" class="${btnGhost}">שמור העדפות</button>`)}</div>
+    </div>
+  </div>`;
+}
+function openCookiePrefs() {
+  const c = getConsent();
+  cookiePrefs = { statistics: !!(c && c.statistics), marketing: !!(c && c.marketing) };
+  renderCookiePrefs();
+}
+function closeCookieUI() { if (getConsent()) cookieRoot.innerHTML = ''; else renderCookieBanner(); }
+cookieRoot.addEventListener('click', e => {
+  const b = e.target.closest('[data-cookie]');
+  if (!b) return;
+  const a = b.dataset.cookie;
+  if (a === 'all') { setConsent(true, true); cookieRoot.innerHTML = ''; }
+  else if (a === 'reject') { setConsent(false, false); cookieRoot.innerHTML = ''; }
+  else if (a === 'save') { setConsent(cookiePrefs.statistics, cookiePrefs.marketing); cookieRoot.innerHTML = ''; }
+  else if (a === 'prefs') openCookiePrefs();
+  else if (a === 'close') closeCookieUI();
+  else if (a === 'toggle') { cookiePrefs[b.dataset.key] = !cookiePrefs[b.dataset.key]; renderCookiePrefs(); }
+  else if (a === 'details') {
+    const p = b.closest('.p-4').querySelector('p');
+    p.classList.toggle('hidden');
+    b.setAttribute('aria-expanded', String(!p.classList.contains('hidden')));
+    b.querySelector('span').textContent = p.classList.contains('hidden') ? '▼' : '▲';
+  }
+});
+document.getElementById('cookiePrefsLink').addEventListener('click', openCookiePrefs);
+if (!getConsent()) renderCookieBanner();
+
+// ───── Analytics (same model as the Kia site: Supabase table, visitors can only add rows) ─────
+// Supabase project "trade-mobile" (ADI System org). Table + rules: trade-mobile-catalog\supabase\analytics.sql
+// The publishable key is meant to be public; reading the data needs an admin login (see #admin).
+const SUPABASE_URL = 'https://arqprdrhpepgqzuyjomm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_6gPWKXY6DJ57t8UZILieSQ_B6k7I4Qd';
+const TRACK_ON_HOST = !/^(localhost|127\.0\.0\.1)$|claude/.test(location.hostname);
+function sessionId() {
+  try {
+    let id = sessionStorage.getItem('analytics_session_id');
+    if (!id) { id = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)); sessionStorage.setItem('analytics_session_id', id); }
+    return id;
+  } catch { return 'no-storage'; }
+}
+const deviceType = () => innerWidth < 768 ? 'mobile' : innerWidth < 1024 ? 'tablet' : 'desktop';
+function trackEvent(eventType, data = {}) {
+  if (!SUPABASE_URL || !TRACK_ON_HOST || !hasConsentFor('statistics')) return;
+  try {
+    fetch(`${SUPABASE_URL}/rest/v1/tm_analytics_events`, {
+      method: 'POST', keepalive: true,
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ event_type: eventType, page: data.page || null, product: data.product || null, session_id: sessionId(),
+        device_type: deviceType(), referrer: (document.referrer || '').slice(0, 500) || null, metadata: data.metadata || {} }),
+    }).catch(() => {});
+  } catch { /* analytics must never break the page */ }
+}
+let lastTracked = '';
+function trackPage() {
+  const h = location.hash.slice(1);
+  if (h === 'admin') return;
+  const path = !h || h === 'home' || h === 'products' ? '/' : '/' + h;
+  if (path === lastTracked) return;
+  lastTracked = path;
+  if (h.startsWith('p-')) trackEvent('product_view', { page: path, product: h.slice(2) });
+  else trackEvent('page_view', { page: path });
+}
+window.addEventListener('cookie-consent-changed', () => { lastTracked = ''; trackPage(); });
+
 // ───── Hamburger menu ─────
 const drawer = document.getElementById('drawer'), scrim = document.getElementById('scrim');
 const menuLink = (href, icon, label, color, extra = '') =>
@@ -552,6 +725,8 @@ const modal = document.getElementById('sheet');
 const sheetImage = url => url.replace(/^sheets\/(.+)\.pdf$/, 'sheets/img/$1-1.jpg');
 function openSheet(url, title) {
   const img = sheetImage(url);
+  const openProduct = location.hash.startsWith('#p-') ? location.hash.slice(3) : null;
+  trackEvent('sheet_view', { page: location.hash ? '/' + location.hash.slice(1) : '/', product: openProduct, metadata: { sheet: url.split('/').pop(), title } });
   document.getElementById('sheetTitle').textContent = title;
   document.getElementById('sheetLink').href = img;
   document.getElementById('sheetBody').innerHTML =
@@ -616,7 +791,7 @@ function closeItem() {
   document.title = 'אדי × טרייד מוביל';
 }
 // Closing the window goes back to the home page, keeping the scroll position
-function leaveItem() { history.replaceState(null, '', '#home'); closeItem(); }
+function leaveItem() { history.replaceState(null, '', '#home'); closeItem(); lastTracked = '/'; }
 
 document.addEventListener('click', e => {
   const cp = e.target.closest('[data-copy]');
@@ -649,8 +824,169 @@ document.addEventListener('keydown', e => {
   closeMenu();
 });
 
+// ───── Analytics page for ADI only (#admin, not linked anywhere; needs a Supabase login listed in tm_admins) ─────
+let sb = null, adminDays = 30;
+function loadSupabase() {
+  if (sb) return Promise.resolve(sb);
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+    s.onload = () => { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); res(sb); };
+    s.onerror = () => rej(new Error('load'));
+    document.head.appendChild(s);
+  });
+}
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const adminCard = (title, body, cls = '') => `<div class="rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5 ${cls}"><h2 class="mb-3 text-base font-bold text-neutral-900">${title}</h2>${body}</div>`;
+const adminWrap = body => `<div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">${body}</div>`;
+
+function renderAdmin() {
+  document.title = 'אנליטיקה | אדי × טרייד מוביל';
+  if (!SUPABASE_URL) return adminWrap('<p class="text-neutral-500">האנליטיקה עוד לא מחוברת.</p>');
+  setTimeout(initAdmin, 0);
+  return adminWrap('<div id="adminBody" class="text-neutral-500">טוען…</div>');
+}
+async function initAdmin() {
+  const box = document.getElementById('adminBody');
+  try { await loadSupabase(); } catch { box.textContent = 'לא ניתן לטעון את מערכת הכניסה. נסו לרענן.'; return; }
+  const { data } = await sb.auth.getSession();
+  if (data.session) renderAdminDashboard(); else renderAdminLogin();
+}
+function renderAdminLogin(error = '') {
+  const box = document.getElementById('adminBody');
+  if (!box) return;
+  box.innerHTML = `
+    <form id="adminLogin" class="mx-auto mt-6 max-w-sm space-y-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <h1 class="text-2xl font-bold text-neutral-900">כניסה לאנליטיקה</h1>
+      <label class="block text-sm font-medium text-neutral-700">דוא״ל
+        <input name="email" type="email" required autocomplete="username" dir="ltr" class="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-base focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></label>
+      <label class="block text-sm font-medium text-neutral-700">סיסמה
+        <input name="password" type="password" required autocomplete="current-password" dir="ltr" class="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-base focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></label>
+      ${error ? `<p class="text-sm text-red-600">${esc(error)}</p>` : ''}
+      <button class="w-full rounded-lg bg-blue-600 py-2.5 font-semibold text-white hover:bg-blue-700">כניסה</button>
+    </form>`;
+  document.getElementById('adminLogin').addEventListener('submit', async e => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    e.target.querySelector('button').textContent = 'מתחבר…';
+    const { error } = await sb.auth.signInWithPassword({ email: f.get('email'), password: f.get('password') });
+    if (error) renderAdminLogin('דוא״ל או סיסמה שגויים'); else renderAdminDashboard();
+  });
+}
+async function fetchEvents(days) {
+  const since = new Date(Date.now() - days * 864e5).toISOString();
+  const rows = [];
+  for (let from = 0; ; from += 1000) {   // Supabase returns up to 1000 rows per request
+    const { data, error } = await sb.from('tm_analytics_events')
+      .select('created_at,event_type,page,product,session_id,device_type,metadata')
+      .gte('created_at', since).order('created_at', { ascending: true }).range(from, from + 999);
+    if (error) throw error;
+    rows.push(...data);
+    if (data.length < 1000 || rows.length >= 100000) break;
+  }
+  return rows;
+}
+const PAGE_NAMES = { '/': 'דף הבית', '/reps': 'מידע לנציגים', '/accessibility': 'הצהרת נגישות', '/terms': 'תקנון', '/privacy': 'מדיניות פרטיות' };
+const barRow = (label, n, max, color = 'bg-blue-500', extra = '') => `
+  <div class="flex items-center gap-3 text-sm">
+    <span class="w-40 shrink-0 truncate text-neutral-700 sm:w-56">${label}</span>
+    <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-neutral-100"><div class="h-full rounded-full ${color}" style="width:${max ? Math.max(2, n / max * 100) : 0}%"></div></div>
+    <span class="w-20 shrink-0 text-left font-semibold tabular-nums text-neutral-900">${n.toLocaleString('he-IL')}${extra}</span>
+  </div>`;
+
+async function renderAdminDashboard() {
+  const box = document.getElementById('adminBody');
+  if (!box) return;
+  box.innerHTML = '<p class="text-neutral-500">טוען נתונים…</p>';
+  let rows;
+  try { rows = await fetchEvents(adminDays); }
+  catch { box.innerHTML = '<p class="text-red-600">לא ניתן לטעון נתונים. ייתכן שהמשתמש הזה לא מורשה לצפות באנליטיקה.</p>'; return; }
+
+  const sessions = new Set(rows.map(r => r.session_id));
+  const views = rows.filter(r => r.event_type === 'page_view' || r.event_type === 'product_view');
+  const productViews = rows.filter(r => r.event_type === 'product_view');
+  const sheetViews = rows.filter(r => r.event_type === 'sheet_view');
+
+  // Visitors per day
+  const dayKey = d => d.toLocaleDateString('en-CA');
+  const days = [];
+  for (let i = adminDays - 1; i >= 0; i--) days.push(dayKey(new Date(Date.now() - i * 864e5)));
+  const perDay = Object.fromEntries(days.map(d => [d, new Set()]));
+  rows.forEach(r => { const k = dayKey(new Date(r.created_at)); if (perDay[k]) perDay[k].add(r.session_id); });
+  const dayCounts = days.map(d => perDay[d].size), dayMax = Math.max(1, ...dayCounts);
+  const chart = `
+    <div class="flex h-40 items-end gap-[2px]" dir="ltr">
+      ${days.map((d, i) => `<div class="group relative flex-1 rounded-t bg-blue-500/80 hover:bg-blue-600" style="height:${Math.max(dayCounts[i] ? 4 : 1, dayCounts[i] / dayMax * 100)}%" title="${d.split('-').reverse().join('.')}: ${dayCounts[i]} מבקרים"></div>`).join('')}
+    </div>
+    <div class="mt-1 flex justify-between text-xs text-neutral-400" dir="ltr"><span>${days[0].split('-').reverse().slice(0, 2).join('.')}</span><span>${days.at(-1).split('-').reverse().slice(0, 2).join('.')}</span></div>`;
+
+  // Products
+  const prodStats = items.map(it => {
+    const pv = productViews.filter(r => r.product === it.slug);
+    return { title: it.title, opens: pv.length, people: new Set(pv.map(r => r.session_id)).size, sheets: sheetViews.filter(r => r.product === it.slug).length };
+  }).sort((a, b) => b.opens - a.opens);
+  const prodMax = Math.max(0, ...prodStats.map(p => p.opens));
+  const prodTable = `
+    <div class="overflow-x-auto"><table class="w-full text-sm">
+      <thead><tr class="border-b border-neutral-200 text-right text-neutral-500"><th class="py-2 font-medium">מוצר</th><th class="py-2 font-medium">פתיחות</th><th class="py-2 font-medium">מבקרים</th><th class="py-2 font-medium">דף מוצר</th><th class="hidden w-1/3 py-2 sm:table-cell"></th></tr></thead>
+      <tbody>${prodStats.map(p => `<tr class="border-b border-neutral-100">
+        <td class="py-2.5 font-medium text-neutral-900">${esc(p.title)}</td><td class="tabular-nums">${p.opens}</td><td class="tabular-nums">${p.people}</td><td class="tabular-nums">${p.sheets}</td>
+        <td class="hidden py-2.5 sm:table-cell"><div class="h-2 overflow-hidden rounded-full bg-neutral-100"><div class="h-full rounded-full bg-emerald-500" style="width:${prodMax ? p.opens / prodMax * 100 : 0}%"></div></div></td></tr>`).join('')}</tbody>
+    </table></div>`;
+
+  // Devices (by visitor)
+  const devBySession = {};
+  rows.forEach(r => { devBySession[r.session_id] = r.device_type; });
+  const devCount = { mobile: 0, tablet: 0, desktop: 0 };
+  Object.values(devBySession).forEach(d => { if (d in devCount) devCount[d]++; });
+  const devTotal = Object.values(devCount).reduce((a, b) => a + b, 0);
+  const devices = [['נייד', 'mobile', 'bg-blue-500'], ['טאבלט', 'tablet', 'bg-green-500'], ['מחשב', 'desktop', 'bg-purple-500']]
+    .map(([l, k, c]) => barRow(l, devCount[k], devTotal, c, devTotal ? ` <span class="font-normal text-neutral-400">(${Math.round(devCount[k] / devTotal * 100)}%)</span>` : '')).join('');
+
+  // Peak hours
+  const hours = Array(24).fill(0);
+  views.forEach(r => hours[new Date(r.created_at).getHours()]++);
+  const hMax = Math.max(1, ...hours);
+  const peak = `
+    <div class="flex h-28 items-end gap-[2px]" dir="ltr">${hours.map((n, h) => `<div class="flex-1 rounded-t bg-amber-400" style="height:${Math.max(n ? 4 : 1, n / hMax * 100)}%" title="${String(h).padStart(2, '0')}:00 — ${n} צפיות"></div>`).join('')}</div>
+    <div class="mt-1 flex justify-between text-xs text-neutral-400" dir="ltr"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>`;
+
+  // Pages
+  const pageCount = {};
+  rows.filter(r => r.event_type === 'page_view').forEach(r => { pageCount[r.page] = (pageCount[r.page] || 0) + 1; });
+  const pageList = Object.entries(pageCount).sort((a, b) => b[1] - a[1]);
+  const pMax = pageList.length ? pageList[0][1] : 0;
+  const pages = pageList.length ? pageList.map(([p, n]) => barRow(esc(PAGE_NAMES[p] || p), n, pMax, 'bg-neutral-700')).join('') : '<p class="text-sm text-neutral-400">אין עדיין נתונים</p>';
+
+  const kpi = (label, n) => `<div class="rounded-2xl border border-neutral-200 bg-white p-4"><div class="text-sm text-neutral-500">${label}</div><div class="mt-1 text-3xl font-black tabular-nums text-neutral-900">${n.toLocaleString('he-IL')}</div></div>`;
+  const { data: { session } } = await sb.auth.getSession();
+  box.innerHTML = `
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div><h1 class="text-2xl font-bold text-neutral-900">אנליטיקה</h1><p class="text-sm text-neutral-500">רק מבקרים שאישרו עוגיות סטטיסטיקה נספרים</p></div>
+      <div class="flex flex-wrap items-center gap-2">
+        ${[7, 14, 30, 90].map(d => `<button data-days="${d}" class="rounded-full px-3.5 py-1.5 text-sm font-medium ${d === adminDays ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'}">${d} ימים</button>`).join('')}
+        <button id="adminLogout" class="rounded-full border border-neutral-300 px-3.5 py-1.5 text-sm text-neutral-600 hover:bg-neutral-50" title="${esc(session?.user?.email)}">יציאה</button>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      ${kpi('מבקרים', sessions.size)}${kpi('צפיות', views.length)}${kpi('פתיחות מוצר', productViews.length)}${kpi('צפיות בדף מוצר', sheetViews.length)}
+    </div>
+    <div class="mt-4 grid gap-4">
+      ${adminCard('מבקרים לפי יום', chart)}
+      ${adminCard('המוצרים', prodTable)}
+      <div class="grid gap-4 lg:grid-cols-2">
+        ${adminCard('התפלגות מכשירים', `<div class="space-y-3">${devices}</div>`)}
+        ${adminCard('שעות שיא', peak)}
+      </div>
+      ${adminCard('עמודים', `<div class="space-y-3">${pages}</div>`)}
+    </div>`;
+  box.querySelectorAll('[data-days]').forEach(b => b.addEventListener('click', () => { adminDays = +b.dataset.days; renderAdminDashboard(); }));
+  document.getElementById('adminLogout').addEventListener('click', async () => { await sb.auth.signOut(); renderAdminLogin(); });
+}
+
 function route() {
   const h = location.hash.slice(1);
+  trackPage();
   closeMenu();
   const app = document.getElementById('app');
   const onHome = !!app.querySelector('#products');
@@ -662,6 +998,7 @@ function route() {
   closeItem();
   if (h === 'reps') { app.innerHTML = renderReps(); window.scrollTo(0, 0); return; }
   if (LEGAL[h]) { app.innerHTML = LEGAL[h](); window.scrollTo(0, 0); return; }
+  if (h === 'admin') { app.innerHTML = renderAdmin(); window.scrollTo(0, 0); return; }
   if (!onHome) { app.innerHTML = renderHome(); window.scrollTo(0, 0); }
 }
 window.addEventListener('hashchange', route);
