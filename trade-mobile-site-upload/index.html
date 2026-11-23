@@ -933,7 +933,7 @@ const PAGE_NAMES = { '/': 'דף הבית', '/reps': 'מידע לנציגים', '
 const barRow = (label, n, max, color = 'bg-blue-500', extra = '', labelW = 'w-40 sm:w-56') => `
   <div class="flex items-center gap-3 text-sm">
     <span class="${labelW} shrink-0 truncate text-neutral-700">${label}</span>
-    <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-neutral-100"><div class="h-full rounded-full ${color}" style="width:${max ? Math.max(2, n / max * 100) : 0}%"></div></div>
+    <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-neutral-100"><div class="h-full rounded-full ${color}" style="width:${max && n ? Math.max(2, n / max * 100) : 0}%"></div></div>
     <span class="min-w-[2.5rem] shrink-0 whitespace-nowrap text-left font-semibold tabular-nums text-neutral-900">${n.toLocaleString('he-IL')}${extra}</span>
   </div>`;
 
@@ -967,7 +967,7 @@ async function renderAdminDashboard() {
   const prodStats = items.map(it => {
     const pv = productViews.filter(r => r.product === it.slug);
     const dw = rows.filter(r => r.event_type === 'dwell_time' && r.product === it.slug).map(r => +(r.metadata || {}).duration_seconds || 0);
-    return { title: it.title, opens: pv.length, people: new Set(pv.map(r => r.session_id)).size, sheets: sheetViews.filter(r => r.product === it.slug).length,
+    return { slug: it.slug, parts: it.parts, title: it.title, opens: pv.length, people: new Set(pv.map(r => r.session_id)).size, sheets: sheetViews.filter(r => r.product === it.slug).length,
       dwell: dw.length ? Math.round(dw.reduce((a, b) => a + b, 0) / dw.length) : null };
   }).sort((a, b) => b.opens - a.opens);
   const fmtDur = s => s == null ? '—' : s < 60 ? `${s} שנ׳` : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} דק׳`;
@@ -984,7 +984,14 @@ async function renderAdminDashboard() {
       <thead><tr class="border-b border-neutral-200 text-right text-neutral-500"><th class="py-2 font-medium">מוצר</th><th class="py-2 font-medium">פתיחות</th><th class="py-2 font-medium">מבקרים</th><th class="py-2 font-medium">דף מוצר</th><th class="py-2 font-medium">זמן צפייה ממוצע</th><th class="hidden w-1/4 py-2 sm:table-cell"></th></tr></thead>
       <tbody>${prodStats.map(p => `<tr class="border-b border-neutral-100">
         <td class="py-2.5 font-medium text-neutral-900">${esc(p.title)}</td><td class="tabular-nums">${p.opens}</td><td class="tabular-nums">${p.people}</td><td class="tabular-nums">${p.sheets}</td><td class="whitespace-nowrap tabular-nums">${fmtDur(p.dwell)}</td>
-        <td class="hidden py-2.5 sm:table-cell"><div class="h-2 overflow-hidden rounded-full bg-neutral-100"><div class="h-full rounded-full bg-emerald-500" style="width:${prodMax ? p.opens / prodMax * 100 : 0}%"></div></div></td></tr>`).join('')}</tbody>
+        <td class="hidden py-2.5 sm:table-cell"><div class="h-2 overflow-hidden rounded-full bg-neutral-100"><div class="h-full rounded-full bg-emerald-500" style="width:${prodMax ? p.opens / prodMax * 100 : 0}%"></div></div></td></tr>
+        ${(p.parts || []).map(part => {
+          // Kit items: each part has its own product sheet, counted separately
+          const file = part.sheet.split('/').pop();
+          const n = sheetViews.filter(r => (r.metadata || {}).sheet === file).length;
+          return `<tr class="border-b border-neutral-100 bg-neutral-50/60 text-neutral-600">
+            <td class="py-2 pr-5 text-[13px]">↳ ${esc(part.name)}</td><td class="text-neutral-300">—</td><td class="text-neutral-300">—</td><td class="tabular-nums">${n}</td><td class="text-neutral-300">—</td><td class="hidden sm:table-cell"></td></tr>`;
+        }).join('')}`).join('')}</tbody>
     </table></div>`;
 
   // Devices (by visitor)
