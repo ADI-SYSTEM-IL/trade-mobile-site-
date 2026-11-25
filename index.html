@@ -1,0 +1,1107 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body style="margin:0">
+<title>אדי × טרייד מוביל</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>document.documentElement.dir = 'rtl'; document.documentElement.lang = 'he';</script>
+<style>
+  /* Single light look by choice (product catalog shown to customers) */
+  :root { --bg: #ffffff; --fg: #171717; color-scheme: light; }
+  body { background: var(--bg); color: var(--fg); font-family: 'Heebo', 'Segoe UI', Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+  /* Kia tile behaviour: photo zooms, overlay lightens on hover */
+  .tile .media { transition: transform .5s ease-out; }
+  .tile:hover .media { transform: scale(1.08); }
+  .tile .shade { transition: opacity .5s ease-out; }
+  .tile:hover .shade { opacity: .55; }
+  @keyframes rise { from { transform: translateY(14px) } to { transform: none } }
+  .rise { animation: rise .7s ease-out both; }
+  #drawer { transition: transform .3s ease; }
+  .site-header { top: env(safe-area-inset-top, 0px); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: #fff; }
+  @media (prefers-reduced-motion: reduce) { .rise { animation: none } .tile .media { transition: none } }
+  /* ───── Accessibility widget overrides (same as the Kia site) ───── */
+  html { font-size: calc(1rem * var(--a11y-font-scale, 1)); }
+  html.a11y-high-contrast { filter: contrast(1.4); background: #000; }
+  html.a11y-high-contrast body, html.a11y-high-contrast .bg-white, html.a11y-high-contrast main,
+  html.a11y-high-contrast section, html.a11y-high-contrast header, html.a11y-high-contrast footer { background: #000 !important; color: #fff !important; }
+  html.a11y-high-contrast a, html.a11y-high-contrast .text-blue-600 { color: #ffeb3b !important; }
+  html.a11y-highlight-links a { text-decoration: underline !important; text-decoration-thickness: 2px !important; text-underline-offset: 2px !important; outline: 1px dashed currentColor; outline-offset: 2px; }
+  html.a11y-readable-font, html.a11y-readable-font body, html.a11y-readable-font * { font-family: Arial, Helvetica, sans-serif !important; letter-spacing: .02em; }
+  html.a11y-reduced-motion *, html.a11y-reduced-motion *::before, html.a11y-reduced-motion *::after { animation-duration: .001s !important; animation-delay: 0s !important; transition-duration: .001s !important; }
+  *:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+</style>
+
+<!-- Header: hamburger + ADI × Trade Mobile -->
+<header class="site-header sticky z-30 w-full border-b border-neutral-100 bg-white/95 backdrop-blur">
+  <div class="relative flex items-center justify-center px-4 py-3 sm:py-4">
+    <button id="menuBtn" class="absolute right-3 flex h-11 w-11 items-center justify-center rounded-xl hover:bg-neutral-100 sm:right-6" aria-label="תפריט">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-6 w-6"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <a href="#home" class="flex items-center gap-4 sm:gap-8">
+      <img src="images/adi-logo.png" alt="אדי מערכות לרכב" class="h-9 w-auto sm:h-12">
+      <span class="text-3xl font-light leading-none text-neutral-900 sm:text-4xl">×</span>
+      <img src="images/Trade%20Mobile%20Hebrew%20logo%20cutout%20(1).png" alt="טרייד מוביל" class="h-10 w-auto sm:h-14">
+
+    </a>
+  </div>
+</header>
+
+<!-- Hamburger drawer -->
+<div id="scrim" class="fixed inset-0 z-40 hidden bg-black/40"></div>
+<nav id="drawer" class="fixed inset-y-0 right-0 z-50 flex w-80 max-w-[85vw] translate-x-full flex-col bg-white shadow-2xl" aria-label="תפריט" style="padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)">
+  <div class="flex items-center justify-between border-b border-neutral-100 px-5 py-4">
+    <span class="text-lg font-extrabold">תפריט</span>
+    <button id="menuClose" class="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-lg hover:bg-neutral-200" aria-label="סגירה">✕</button>
+  </div>
+  <div id="menuList" class="flex-1 overflow-y-auto p-3"></div>
+</nav>
+
+<div id="app"></div>
+
+<!-- Footer (same as the Kia site) -->
+<footer class="border-t border-neutral-100 bg-white py-3" style="padding-bottom:calc(.75rem + env(safe-area-inset-bottom, 0px))">
+  <div class="flex flex-col items-center gap-1.5 px-4 text-xs text-neutral-400">
+    <span>© כל הזכויות שמורות לאדי מערכות</span>
+    <a id="waLink" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-neutral-400 transition-colors hover:text-neutral-600">
+      <span>לכל שאלה</span>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="h-4 w-4" aria-label="WhatsApp"><circle cx="16" cy="16" r="16" fill="#25D366"/><path d="M22.9 9.1A9.7 9.7 0 0 0 16 6.3a9.74 9.74 0 0 0-8.43 14.6L6.3 25.7l4.93-1.3a9.73 9.73 0 0 0 4.77 1.22h.01A9.74 9.74 0 0 0 25.7 16a9.68 9.68 0 0 0-2.8-6.9zm-6.9 14.97a8.08 8.08 0 0 1-4.12-1.13l-.3-.18-3.07.8.82-3-.2-.31a8.1 8.1 0 1 1 6.87 3.82zm4.44-6.07c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.54.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06a6.6 6.6 0 0 1-1.94-1.2 7.28 7.28 0 0 1-1.34-1.67c-.14-.24 0-.37.1-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.16 1.52.1.46-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z" fill="#fff"/></svg>
+    </a>
+    <div class="flex items-center gap-3">
+      <a href="#accessibility" class="transition-colors hover:text-neutral-600 hover:underline">הצהרת נגישות</a>
+      <span class="text-neutral-300">·</span>
+      <a href="#terms" class="transition-colors hover:text-neutral-600 hover:underline">תקנון</a>
+      <span class="text-neutral-300">·</span>
+      <a href="#privacy" class="transition-colors hover:text-neutral-600 hover:underline">מדיניות פרטיות</a>
+      <span class="text-neutral-300">·</span>
+      <button type="button" id="cookiePrefsLink" class="transition-colors hover:text-neutral-600 hover:underline">ניהול עוגיות</button>
+    </div>
+  </div>
+</footer>
+
+<!-- Accessibility button + panel (same options as the Kia site) -->
+<button id="a11yBtn" aria-label="פתיחת תפריט נגישות" title="נגישות" class="fixed z-40 flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-all hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300" style="right:calc(1rem + env(safe-area-inset-right, 0px));bottom:calc(1rem + env(safe-area-inset-bottom, 0px))">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="16" cy="4" r="1"/><path d="m18 19 1-7-6 1M5 8l3-3 5.5 3-2.36 3.5M4.24 14.5a5 5 0 0 0 6.88 6M13.76 17.5a5 5 0 0 0-6.88-6"/></svg>
+</button>
+<div id="a11yPanel" role="dialog" aria-label="תפריט נגישות" class="fixed z-50 hidden w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl" style="right:calc(1rem + env(safe-area-inset-right, 0px));bottom:calc(5rem + env(safe-area-inset-bottom, 0px))">
+  <div class="flex items-center justify-between border-b border-neutral-100 bg-blue-50 px-4 py-3">
+    <h2 class="text-base font-bold text-blue-900">נגישות</h2>
+    <button id="a11yClose" aria-label="סגור תפריט נגישות" class="rounded-full p-1 text-xl leading-none text-blue-700 hover:bg-blue-100">✕</button>
+  </div>
+  <div class="space-y-3 p-4">
+    <div>
+      <p class="mb-2 text-sm font-medium text-neutral-700">גודל טקסט</p>
+      <div class="flex items-center gap-2">
+        <button data-a11y="font-" aria-label="הקטן טקסט" class="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-white text-lg hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40">−</button>
+        <div id="a11yFont" class="flex-1 text-center text-sm font-medium text-neutral-600">100%</div>
+        <button data-a11y="font+" aria-label="הגדל טקסט" class="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-white text-lg hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40">+</button>
+      </div>
+    </div>
+    <div id="a11yToggles" class="space-y-3"></div>
+    <div class="space-y-2 border-t border-neutral-100 pt-3">
+      <button data-a11y="reset" class="flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">איפוס הגדרות</button>
+      <a href="#accessibility" class="block w-full py-1 text-center text-xs text-blue-600 hover:underline">הצהרת נגישות</a>
+    </div>
+  </div>
+</div>
+
+<!-- Cookie consent banner + preferences (same as the Kia site) -->
+<div id="cookieRoot"></div>
+
+<!-- Product-sheet viewer -->
+<div id="sheet" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 p-3 sm:p-6">
+  <div class="relative flex h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white">
+    <div class="flex items-center justify-between gap-3 border-b border-neutral-100 px-4 py-3">
+      <span id="sheetTitle" class="min-w-0 truncate font-bold"></span>
+      <div class="flex shrink-0 items-center gap-2">
+        <a id="sheetLink" target="_blank" rel="noopener" class="hidden rounded-full bg-neutral-100 px-4 py-2 text-sm font-medium hover:bg-neutral-200 sm:inline-block">פתיחה בחלון חדש ↗</a>
+        <button id="sheetClose" class="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-xl hover:bg-neutral-200" aria-label="סגירה">✕</button>
+      </div>
+    </div>
+    <div id="sheetBody" class="flex-1 overflow-y-auto bg-neutral-100"></div>
+  </div>
+</div>
+
+<script>
+const ICON = {
+  camera:  '<path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
+  screen:  '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  shield:  '<path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+  pin:     '<path d="M20 10c0 5-5.5 10.2-7.4 11.8a1 1 0 0 1-1.2 0C9.5 20.2 4 15 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  sparkle: '<path d="M9.9 15.5A2 2 0 0 0 8.5 14.1L2.4 12.5a.5.5 0 0 1 0-1l6.1-1.6a2 2 0 0 0 1.4-1.4l1.6-6.1a.5.5 0 0 1 1 0l1.6 6.1a2 2 0 0 0 1.4 1.4l6.1 1.6a.5.5 0 0 1 0 1l-6.1 1.6a2 2 0 0 0-1.4 1.4l-1.6 6.1a.5.5 0 0 1-1 0z"/><path d="M20 3v4M22 5h-4"/>',
+  speaker: '<rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="14" r="4"/><path d="M12 6h.01"/>',
+  baby:    '<path d="M9 12h.01M15 12h.01M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"/>',
+  wind:    '<path d="M12.8 19.6A2 2 0 1 0 14 16H2M17.5 8a2.5 2.5 0 1 1 2 4H2M9.8 4.4A2 2 0 1 1 11 8H2"/>',
+  gauge:   '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
+  phone:   '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
+  bolt:    '<path d="M4 14a1 1 0 0 1-.8-1.6l9.9-10.2a.5.5 0 0 1 .9.5l-1.9 6A1 1 0 0 0 13 10h7a1 1 0 0 1 .8 1.6l-9.9 10.2a.5.5 0 0 1-.9-.5l1.9-6A1 1 0 0 0 11 14z"/>',
+  file:    '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/>',
+  users:   '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  home:    '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+};
+const svg = (k, cls, sw = 1.75) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" class="${cls}">${ICON[k]}</svg>`;
+
+const S = 'sheets/';
+// Web-size copies (max 1600px, JPG) live in images/web/ with the same base name
+const KIT_TRUNK = 'kit-trunk.png'; // AI-generated empty trunk (Figma), products are overlaid as real photos
+const I = name => /\.(webp|avif)$/i.test(name)
+  ? 'images/' + encodeURIComponent(name)
+  : 'images/web/' + encodeURIComponent(name.replace(/\.[^.]+$/, '') + '.jpg');
+const JBL_MOOD = 'Bass-pro-go_-uitgelichte-afbeelding-1024x576.jpg.webp';
+
+// Product photos Lior added (first = main photo on the product page, tile = photo on the home tile)
+const partPhotos = ['BCARE!.jpg', 'car-vacuum-hl-109b.jpg', 'HL-010 קומפרסור 1.png', 'C22-wireless-phone-charging-pad-for-cars-min-600x600.jpg', 'בוסטר התנעה לרכב-01.png'];
+// tile: photo on the home tile (null = collage of the kit's products). TODO: lifestyle photos for kit / Achilles / JBL, sharper nano photo
+const photos = {
+  q200:     { tile: 'Q200 רכב 01.jpg', gallery: ['Q200 רכב 01.jpg', 'Q200 רכב 03.png', 'תמונות מוצר Q200-03.jpg'] },
+  screens:  { tile: 'Girl with upgraded TABY+ car screens.png', gallery: ['Girl with upgraded TABY+ car screens.png', 'TABY+-01.png', 'TABY+ 2.png', 'מסך אנדרואיד למשענת הראש.png', 'Adi-Go-Kids (7).JPG'] },
+  bcare:    { tile: null, gallery: ['BCARE.jpg', 'BCARE!.jpg'] },
+  achilles: { tile: 'achilles-mood.jpg', gallery: ['achilles-mood.jpg', 'מערכת איתור.png'] },
+  polish:   { tile: 'ננו.jpg', gallery: ['ננו.jpg'], cover: true },
+  jbl:      { tile: JBL_MOOD, gallery: [JBL_MOOD, 'JBL_Basspro_Go_904x560_LS1.avif', 'BASSPRO GO.png'] },
+};
+// Tile order sets tile size (Kia grid): wide, tall, normal, normal, wide, normal — big tiles get the sharpest photos
+const tileOrder = ['q200', 'screens', 'bcare', 'polish', 'achilles', 'jbl'];
+
+// ───── The 6 benefit items (names + prices from the Trade Mobile email/list; text from the product sheets) ─────
+const items = [
+  { slug: 'q200', icon: 'camera', soft: '#e0f2fe', ink: '#0369a1',
+    title: 'מצלמת דרך קדמית + אחורית Q200', price: 1540, sheet: S + 'q200.pdf',
+    lead: 'מצלמת דרך דו כיוונית לתיעוד והקלטה של אירועים במהלך נסיעה',
+    points: ['מצלמה קדמית 2K ואחורית Full HD', 'מתעדת גם כשהרכב עומד בחניה', 'צפייה באפליקציה בעברית'] },
+
+  { slug: 'screens', icon: 'screen', soft: '#f3e8ff', ink: '#7e22ce',
+    title: 'זוג מסכי אנדרואיד אחוריים', price: 3800, sheet: S + 'taby-plus.pdf',
+    lead: 'מסכי מולטימדיה לנוסעים במושב האחורי, לצפייה בסרטונים ולשימוש באפליקציות',
+    points: ['זוג מסכי אנדרואיד אחוריים', 'דונגל WIFI', 'חבילת גלישה 12G או 12 חודשים (המוקדם מביניהם)', 'זוג אוזניות אלחוטיות'] },
+
+  { slug: 'bcare', icon: 'shield', soft: '#dcfce7', ink: '#15803d',
+    title: 'ערכת בטיחות ונוחות', price: 1780,
+    lead: 'מערכת BCARE נגד שכחת ילדים ועוד 4 אביזרים שימושיים לרכב',
+    parts: [
+      { icon: 'baby',  name: 'מערכת התראה נגד שכחת ילדים BCARE', line: 'כרית על כיסא הבטיחות שולחת התראה לנייד אם הילד נשאר ברכב', sheet: S + 'bcare.pdf' },
+      { icon: 'wind',  name: 'שואב אבק נטען נייד לרכב',          line: 'שואב קטן ונטען, עם מסנן HEPA',                           sheet: S + 'vacuum-hl109b.pdf' },
+      { icon: 'gauge', name: 'קומפרסור נטען נייד',                line: 'ניפוח מהיר של צמיגי הרכב, נטען ב-USB',                     sheet: S + 'compressor-hl010.pdf' },
+      { icon: 'phone', name: 'מעמד לטלפון עם טעינה אלחוטית',      line: 'מחזיק את הטלפון ומטעין אותו בזמן הנסיעה',                  sheet: S + 'holder-c22.pdf' },
+      { icon: 'bolt',  name: 'בוסטר לרכב',                         line: 'מתניע את הרכב כשהמצבר ריק, כולל פנס',                      sheet: S + 'booster.pdf' },
+    ] },
+
+  { slug: 'achilles', icon: 'pin', soft: '#ffedd5', ink: '#c2410c',
+    title: 'מערכת איתור פעילה – אקילס', price: 1990, sheet: S + 'warrior-pro-private-car.pdf',
+    lead: 'מערכת איתור פעילה הכוללת לוח מקשים, מתאימה להתקנה ברכב פרטי',
+    points: ['איתור ומעקב GPS ברשת 4G, עם ממסר ניתוק', 'מוקד אכיפה 24/7 כולל סיירים בשטח', 'אפליקציה לאיתור ומעקב בזמן אמת'],
+    small: 'לא כולל דמי מנוי',
+    repNote: 'יש לבדוק עם הלקוח לפני דרישת מיגון' },
+
+  { slug: 'polish', icon: 'sparkle', soft: '#cffafe', ink: '#0e7490',
+    title: 'פוליש + ננו לרכב', price: 3500, sheet: S + 'detailing.pdf',
+    lead: 'ציפוי ננו קרמי שיוצר שכבת הגנה שקופה על הלכה ושומר על הברק של הרכב',
+    points: ['הגנת UV מלאה', 'אפקט הידרופובי – המים מחליקים מהרכב', 'ניקיון בקלות'] },
+
+  { slug: 'jbl', icon: 'speaker', soft: '#ffe4e6', ink: '#be123c',
+    title: 'סאב וופר נשלף JBL BassPro Go', price: 3080, sheet: S + 'jbl-basspro-go.pdf',
+    lead: 'סאב־וופר לרכב שנשלף והופך לרמקול בלוטות׳ נייד',
+    points: ['סאב־וופר 8 אינץ׳ עם מגבר 200W', 'עמיד במים, סוללה עד 6 שעות', 'מתאים גם לתא מטען קטן'] },
+];
+
+// Commissions (rep / manager) and installation place — from the Trade Mobile table & email
+// ───── מק״טים (מהספק) — למלא בין המירכאות. מק״ט ריק לא מוצג באתר ─────
+const SKUS = {
+  q200:     '',   // מצלמת דרך Q200
+  screens:  '',   // זוג מסכי אנדרואיד אחוריים
+  bcare:    '',   // ערכת בטיחות ונוחות (מק״ט הערכה כולה)
+  achilles: '',   // מערכת איתור אקילס
+  polish:   '',   // פוליש + ננו
+  jbl:      '',   // JBL BassPro Go
+  // המוצרים בתוך ערכת בטיחות ונוחות:
+  'bcare-1': '',  // BCARE
+  'bcare-2': '',  // שואב אבק
+  'bcare-3': '',  // קומפרסור
+  'bcare-4': '',  // מעמד טלפון C22
+  'bcare-5': '',  // בוסטר
+};
+
+const commissions = { q200: [100, 50], screens: [150, 50], bcare: [100, 50], achilles: [150, 50], polish: [150, 50], jbl: [100, 50] };
+const INSTALL_ALL = 'כלל ההתקנות והשירותים מתבצעים בא.ד.י מערכות (רח׳ אליהו איתן 1, ראשון לציון), או בתחנות התקנה / תחנות דיטיילינג (בהתאם למוצר).';
+const install = { polish: 'בתחנות הדיטיילינג', jbl: 'בתחנות ההתקנה' };
+const installDefault = 'בא.ד.י מערכות בראשון לציון או בתחנות התקנה';
+
+const fmt = n => '₪' + n.toLocaleString('he-IL');
+const star = '<span class="text-amber-400">★</span>';
+const backLink = `<a href="#home" class="mb-4 inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200">→ חזרה לכל המוצרים</a>`;
+
+function spanClass(i, total) { // Kia asymmetric grid
+  const full = Math.floor(total / 4), rem = total % 4, lastStart = full * 4;
+  if (rem > 0 && i >= lastStart) {
+    const p = i - lastStart;
+    if (rem === 1) return 'col-span-2 lg:col-span-3';
+    if (rem === 2) return p === 0 ? 'col-span-1 lg:col-span-2' : 'col-span-1';
+    return 'col-span-1';
+  }
+  const rev = Math.floor(i / 4) % 2 === 1, pos = i % 4;
+  if (pos === 0) return rev ? 'lg:row-span-2' : 'lg:col-span-2';
+  if (pos === 1) return rev ? 'lg:col-span-2' : 'lg:row-span-2';
+  return '';
+}
+
+// Tile picture: one photo, or for the kit a collage of its 5 products
+function tileMedia(it) {
+  const p = photos[it.slug];
+  if (!p.tile) return `
+    <div class="media absolute inset-0">
+      <img src="${I(KIT_TRUNK)}" alt="" class="absolute inset-0 h-full w-full object-cover">
+      <div class="absolute inset-x-[14%] top-[30%] flex items-end justify-center gap-[2%]">
+        ${partPhotos.map(src => `<div class="aspect-square w-[18%] overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black/5 sm:rounded-lg"><img src="${I(src)}" alt="" class="h-full w-full object-contain p-[8%]"></div>`).join('')}
+      </div>
+    </div>`;
+  return `<img src="${I(p.tile)}" alt="" class="media absolute inset-0 h-full w-full ${p.light ? 'bg-white object-contain p-4 sm:p-8' : 'object-cover'}">`;
+}
+
+function renderHome() {
+  document.title = 'אדי × טרייד מוביל';
+  const order = tileOrder.map(s => items.find(x => x.slug === s));
+  return `
+  <section class="px-4 pb-6 pt-8 text-center sm:pb-8 sm:pt-12">
+    <h1 class="rise text-3xl font-black leading-tight sm:text-5xl" style="text-wrap:balance">בחרו את ההטבה שלכם</h1>
+  </section>
+
+  <main id="products" class="px-1 pb-1">
+    <div class="grid grid-cols-2 auto-rows-[180px] gap-1 md:auto-rows-[240px] lg:grid-cols-3 lg:auto-rows-[340px]">
+      ${order.map((it, i) => `
+      <a href="#p-${it.slug}" class="tile group relative block overflow-hidden bg-neutral-200 ${spanClass(i, order.length)}">
+        ${tileMedia(it)}
+        <div class="shade pointer-events-none absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.25) 45%, rgba(0,0,0,.08) 100%)"></div>
+        <div class="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 px-3 pb-5 text-center text-white sm:pb-8">
+          <h2 class="text-base font-bold leading-snug drop-shadow-lg sm:text-2xl lg:text-3xl" style="text-wrap:balance">${it.title}</h2>
+          <span class="text-sm font-medium text-white/90 drop-shadow sm:text-lg">${fmt(it.price)}</span>
+        </div>
+      </a>`).join('')}
+    </div>
+  </main>`;
+}
+
+function renderReps() {
+  document.title = 'מידע לנציגים – אדי × טרייד מוביל';
+  return `
+  <div class="mx-auto max-w-4xl px-4 pb-16 pt-5 sm:px-6">
+    ${backLink}
+    <h1 class="text-2xl font-bold text-neutral-900 sm:text-4xl">מידע לנציגים</h1>
+
+    <h2 class="mb-3 mt-8 text-lg font-bold text-neutral-900 sm:text-xl">עמלות</h2>
+    <div class="overflow-x-auto rounded-2xl border border-neutral-200">
+      <table class="w-full min-w-[30rem] text-right text-sm sm:text-base" style="font-variant-numeric:tabular-nums">
+        <thead class="bg-neutral-50 text-neutral-500">
+          <tr>
+            <th class="px-4 py-3 font-medium">מוצר / חבילה</th>
+            <th class="px-3 py-3 font-medium">שווי ההטבה</th>
+            <th class="px-3 py-3 font-medium">עמלת נציג</th>
+            <th class="px-3 py-3 font-medium">עמלת מנהל</th>
+          </tr>
+        </thead>
+        <tbody>${items.map(it => `
+          <tr class="border-t border-neutral-100">
+            <td class="px-4 py-3 font-medium text-neutral-900">${it.title}</td>
+            <td class="whitespace-nowrap px-3 py-3 text-neutral-600">${fmt(it.price)}</td>
+            <td class="whitespace-nowrap px-3 py-3 font-bold text-neutral-900">${fmt(commissions[it.slug][0])}</td>
+            <td class="whitespace-nowrap px-3 py-3 font-bold text-neutral-900">${fmt(commissions[it.slug][1])}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 class="mb-3 mt-10 text-lg font-bold text-neutral-900 sm:text-xl">דגשי ביצוע ותפעול</h2>
+    <dl class="divide-y divide-neutral-100 rounded-2xl border border-neutral-200">
+      <div class="grid gap-1 p-4 sm:grid-cols-[12rem_1fr] sm:gap-6 sm:p-5">
+        <dt class="font-bold text-neutral-900">מיקום התקנות ושירות</dt>
+        <dd class="text-neutral-600">${INSTALL_ALL}</dd>
+      </div>
+      <div class="grid gap-1 p-4 sm:grid-cols-[12rem_1fr] sm:gap-6 sm:p-5">
+        <dt class="font-bold text-neutral-900">איתור אקילס</dt>
+        <dd class="text-neutral-600">מערכת איתור פעילה עם לוח מקשים בלבד, אינה כוללת דמי מנוי, ויש לבדוק מול הלקוח לפני דרישת מיגון.</dd>
+      </div>
+      <div class="grid gap-1 p-4 sm:grid-cols-[12rem_1fr] sm:gap-6 sm:p-5">
+        <dt class="font-bold text-neutral-900">עמלות</dt>
+        <dd class="text-neutral-600">במכירת חבילות האבזור הקבועות משולמת עמלה לנציג ולמנהל כמפורט בטבלה.</dd>
+      </div>
+    </dl>
+  </div>`;
+}
+
+// SKU with a one-tap copy button (shown only when filled in)
+const copyIco = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const skuChip = key => {
+  const sku = (SKUS[key] || '').trim();
+  if (!sku) return '';
+  return `<button data-copy="${sku}" class="inline-flex items-center gap-2 self-start rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-sm text-neutral-700 transition hover:border-neutral-400 hover:bg-white" title="העתקת המק״ט">
+    <span class="text-neutral-500">מק״ט</span><span class="font-mono font-bold tracking-wide" dir="ltr">${sku}</span><span class="text-neutral-400">${copyIco}</span>
+  </button>`;
+};
+
+const sheetBtn = (url, title, ink, big) => `
+  <button data-sheet="${url}" data-title="${title}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 font-bold text-white shadow-sm transition hover:bg-blue-700 ${big ? 'w-full px-6 py-4 text-lg sm:w-auto' : 'w-full px-4 py-3 text-base'}">
+    ${svg('file', big ? 'h-6 w-6' : 'h-5 w-5', 2)} דף מוצר
+  </button>`;
+
+function renderItem(slug, inModal = false) {
+  const it = items.find(x => x.slug === slug);
+  if (!it) return renderHome();
+  document.title = it.title + ' – אדי × טרייד מוביל';
+  return `
+  <div class="${inModal ? 'p-4 pt-14 sm:p-6 sm:pt-14' : 'mx-auto max-w-5xl px-4 pb-16 pt-5 sm:px-6'}">
+    ${inModal ? '' : backLink}
+    ${it.parts ? `
+    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-2xl font-bold text-neutral-900 sm:text-4xl">${it.title}</h1>
+        ${skuChip(it.slug)}
+      </div>
+      <div class="text-left">
+        <div class="text-sm text-neutral-500">שווי ההטבה</div>
+        <div class="text-3xl font-extrabold">${fmt(it.price)}</div>
+      </div>
+    </div>` : `
+    <div class="${inModal ? 'overflow-hidden rounded-2xl bg-white md:flex' : 'overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm md:flex'}">
+      <div class="flex flex-col gap-2 bg-neutral-50 p-2 md:w-[26rem] md:shrink-0">
+        <div class="aspect-[4/3] max-w-full overflow-hidden rounded-xl bg-white">
+          <img id="mainPhoto" src="${I(photos[slug].gallery[0])}" alt="${it.title}" class="h-full w-full ${photos[slug].cover ? 'object-cover' : 'object-contain'}">
+        </div>
+        ${photos[slug].gallery.length > 1 ? `<div class="flex gap-2 overflow-x-auto pb-1">${photos[slug].gallery.map((g, n) => `
+          <button data-photo="${I(g)}" class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-white sm:h-20 sm:w-20 ${n === 0 ? 'border-neutral-900' : 'border-transparent'}" aria-label="תמונה ${n + 1}">
+            <img src="${I(g)}" alt="" loading="lazy" class="h-full w-full object-cover">
+          </button>`).join('')}</div>` : ''}
+      </div>
+      <div class="flex min-w-0 flex-1 flex-col gap-4 p-5 sm:p-7">
+        <div>
+          <h1 class="text-2xl font-extrabold leading-tight sm:text-3xl" style="text-wrap:balance">${it.title}</h1>
+          <p class="mt-2 text-base text-neutral-600 sm:text-lg">${it.lead}</p>
+        </div>
+        ${skuChip(it.slug)}
+        ${it.points ? `<ul class="space-y-2">${it.points.map(p => `<li class="flex items-start gap-2 text-base sm:text-lg">${star}<span>${p}</span></li>`).join('')}</ul>` : ''}
+        ${it.small ? `<p class="text-sm font-medium text-neutral-500">${it.small}</p>` : ''}
+        <p class="flex items-start gap-2 text-sm text-neutral-600 sm:text-base"><span class="text-neutral-400">${svg('pin', 'h-5 w-5 mt-0.5 shrink-0', 2)}</span><span><b>התקנה:</b> ${install[it.slug] || installDefault}</span></p>
+        ${it.repNote ? `<p class="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900"><b>לנציג:</b> ${it.repNote}</p>` : ''}
+        <div class="mt-auto flex flex-col gap-4 border-t border-neutral-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div class="text-sm text-neutral-500">שווי ההטבה</div>
+            <div class="text-3xl font-extrabold">${fmt(it.price)}</div>
+          </div>
+          ${it.sheet ? sheetBtn(it.sheet, it.title, it.ink, true) : ''}
+        </div>
+      </div>
+    </div>`}
+
+    ${it.parts ? `
+    <h2 class="mb-4 mt-8 text-xl font-bold sm:text-2xl">מה יש בערכה?</h2>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      ${it.parts.map((p, n) => `
+      <div class="flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        <div class="relative aspect-[4/3] max-w-full overflow-hidden bg-white">
+          <img src="${I(partPhotos[n])}" alt="${p.name}" loading="lazy" class="h-full w-full object-contain p-3">
+          <span class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 text-sm font-bold text-neutral-700">${n + 1}</span>
+        </div>
+        <div class="flex flex-1 flex-col gap-2 p-4">
+          <h3 class="text-lg font-bold leading-snug">${p.name}</h3>
+          ${skuChip('bcare-' + (n + 1))}
+          <p class="text-sm text-neutral-600 sm:text-base">${p.line}</p>
+          <div class="mt-auto pt-2">${sheetBtn(p.sheet, p.name, it.ink, false)}</div>
+        </div>
+      </div>`).join('')}
+    </div>` : ''}
+  </div>`;
+}
+
+// ───── Footer WhatsApp (same contact as the Kia site) ─────
+// phone: international format without + (e.g. 9725XXXXXXXX). Empty = the "לכל שאלה" link is hidden.
+const WHATSAPP = { phone: '972544280903', text: 'היי שני, יש לי שאלה לגבי אתר ההטבות של טרייד מוביל,' }; // שני כהן
+const waLink = document.getElementById('waLink');
+if (WHATSAPP.phone) waLink.href = `https://wa.me/${WHATSAPP.phone}?text=${encodeURIComponent(WHATSAPP.text)}`;
+else waLink.style.display = 'none';
+
+// ───── Legal pages — text copied from the Kia site (ADI's own pages) ─────
+const dot = '<span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" aria-hidden="true"></span>';
+const li = t => `<li class="flex gap-2">${dot}<span>${t}</span></li>`;
+const legalShell = (title, sub, body) => `
+  <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
+    <a href="#home" class="mb-6 inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900">→ חזרה לאתר</a>
+    <h1 class="text-3xl font-bold text-neutral-900 sm:text-4xl">${title}</h1>
+    <p class="mt-2 text-base text-neutral-500">${sub}</p>
+    ${body}
+  </div>`;
+const h2 = t => `<h2 class="mb-3 text-xl font-bold text-neutral-900 sm:text-2xl">${t}</h2>`;
+const ul = arr => `<ul class="space-y-2.5 text-base leading-relaxed text-neutral-700">${arr.map(li).join('')}</ul>`;
+const contactBox = (title, intro) => `
+  <section class="mt-10 border-t border-neutral-100 pt-8">${h2(title)}
+    <p class="mb-3 text-base leading-relaxed text-neutral-700">${intro}</p>
+    <div class="space-y-2 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-base text-neutral-700 sm:p-6">
+      <p><span class="font-semibold text-neutral-900">טלפון:</span> <a href="tel:1700704100" class="text-blue-600 hover:underline" dir="ltr">1-700-704-100</a> <span class="text-neutral-400">|</span> <a href="tel:039629296" class="text-blue-600 hover:underline" dir="ltr">03-9629296</a></p>
+      <p><span class="font-semibold text-neutral-900">פקס:</span> <span dir="ltr">03-9292967</span></p>
+      <p><span class="font-semibold text-neutral-900">דוא״ל:</span> <a href="mailto:maindesk@adi-system.co.il" class="text-blue-600 hover:underline" dir="ltr">maindesk@adi-system.co.il</a></p>
+    </div>
+  </section>`;
+const numbered = secs => `<div class="mt-10 space-y-8">${secs.map(([t, items], i) => `<section>${h2(`${i + 1}. ${t}`)}${ul(items)}</section>`).join('')}`;
+
+function renderAccessibility() {
+  document.title = 'הצהרת נגישות | א.ד.י. מערכות';
+  return legalShell('הצהרת נגישות', 'א.ד.י. מערכות סטריאו ואזעקות לרכב בע״מ', `
+    <div class="mt-8 space-y-4 text-base leading-relaxed text-neutral-700">
+      <p>חברת א.ד.י מערכות סטריאו ואזעקות לרכב בע״מ נוקטת את מרב המאמצים ומשקיעה משאבים רבים על מנת לספק לכל לקוחותיה שירות שוויוני, מכובד, נגיש ומקצועי. בהתאם לחוק שוויון זכויות לאנשים עם מוגבלויות תשנ״ח-1998 ולתקנות שהותקנו מכוחו, מושקעים מאמצים ומשאבים רבים בביצוע התאמות הנגישות הנדרשות שיביאו לכך שאדם בעל מוגבלות יוכל לקבל את השירותים הניתנים לכלל הלקוחות, באופן עצמאי ושוויוני.</p>
+      <p>העולם סביבנו משתנה ואנו מחויבים להתאים עצמנו למציאות המשתנה תוך ייצור פתרונות טכנולוגיים חכמים שיאפשרו לקהל לקוחותינו חווית נסיעה יוצאת דופן.</p>
+    </div>
+    <section class="mt-10">${h2('הסדרי נגישות מבנים')}
+      <p class="mb-3 text-sm text-neutral-500">הסדרי הנגישות הקיימים במרכז קבלת הקהל בכתובת אליהו איתן 1, ראשון לציון:</p>
+      ${ul(['קיימות חניות נכים בבית העסק וחניון סמוך, כולל לרכב גבוה.', 'קיים רצף גישה מהחניה דרך הכניסה למרכז קבלת הקהל ועד לקבלת השירות (כולל מעליות).', 'קיימות עמדות נגישות לקבלת שירות במרכז קבלת קהל.', 'הותקנו עזרים מסוג "לולאת השראה" ללקויי שמיעה.', 'קיימים שירותי נכים נגישים בלובי הבניין ובקומות השונות.', 'קיימים שלטי זיהוי והכוונה.', 'מותרת כניסה למרכז קבלת הקהל לחיית שירות המיועדת לסייע לאדם עם מוגבלות.', 'במקרה של צורך, ניתן לפנות לנציגי השירות בעמדות כדי לקבל סיוע במילוי טפסים.'])}
+      <p class="mt-4 text-sm italic text-neutral-500">חברת א.ד.י מערכות אחראית על הניהול והסדרי הנגישות במרכז ההתקנות הראשי בראשון לציון בלבד, ואיננה אחראית על הסדרי הנגישות ביתר תחנות השירות אשר נמצאים בהסדר.</p>
+    </section>
+    <section class="mt-10">${h2('שירות לקוחות נגיש')}
+      <ul class="space-y-3 text-base leading-relaxed text-neutral-700">
+        <li><strong class="text-neutral-900">הדרכות עובדים לשירות נגיש</strong> – מתקיימות הדרכות להכרת תחום הנגישות, יצירת מודעות בקרב העובדים והקניית כלים מעשיים למתן שירות נגיש.</li>
+        <li><strong class="text-neutral-900">מוקד טלפוני נגיש</strong> – המענה הקולי הונגש כך שהמידע מועבר בשפה ברורה וללא מוסיקת רקע.</li>
+        <li>ניתן ליצור קשר עם מרכז שירות הלקוחות בטלפון <a href="tel:1700704100" class="font-semibold text-blue-600 hover:underline" dir="ltr">1-700-704-100</a> בימים א׳-ה׳ בין השעות <span dir="ltr">08:00–17:00</span>.</li>
+      </ul>
+      <h3 class="mb-3 mt-6 text-base font-bold text-neutral-900">אמצעים נוספים ליצירת קשר:</h3>
+      <ul class="space-y-2.5 text-base leading-relaxed text-neutral-700">
+        ${li('<strong>טלפון</strong> – <a href="tel:039629296" class="text-blue-600 hover:underline" dir="ltr">03-9629296</a>')}
+        ${li('<strong>פקס</strong> – <span dir="ltr">03-9292967</span>')}
+        ${li('<strong>דואר אלקטרוני</strong> – <a href="mailto:maindesk@adi-system.co.il" class="text-blue-600 hover:underline" dir="ltr">maindesk@adi-system.co.il</a>')}
+      </ul>
+    </section>
+    <section class="mt-10">${h2('נגישות אתר האינטרנט')}
+      <div class="space-y-3 text-base leading-relaxed text-neutral-700">
+        <p>אתר אינטרנט נגיש הוא אתר המאפשר לאנשים עם מוגבלות ולאנשים מבוגרים לגלוש באותה רמה של יעילות והנאה ככל הגולשים. כ-20 עד 25 אחוזים מהאוכלוסייה נתקלים בקשיי שימוש באינטרנט ועשויים להיטיב מתכני אינטרנט נגישים יותר, כך על פי מחקר שנערך בשנת 2003 ע״י חברת מייקרוסופט.</p>
+        <p>חברת א.ד.י מערכות מאמינה ופועלת למען שוויון הזדמנויות במרחב האינטרנטי לבעלי לקויות מגוונות ואנשים הנעזרים בטכנולוגיה מסייעת לשימוש במחשב.</p>
+      </div>
+    </section>
+    <section class="mt-10">${h2('מידע על נגישות האתר')}
+      ${ul(['אתר זה עומד בדרישות תקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע״ג–2013.', 'התאמות הנגישות בוצעו עפ״י המלצות התקן הישראלי (ת״י 5568) לנגישות תכנים באינטרנט ברמת AA ומסמך WCAG 2.0 הבינלאומי.', 'הבדיקות נבחנו לתאימות הגבוהה ביותר עבור דפדפן פיירפוקס.', 'האתר מספק מבנה סמנטי עבור טכנולוגיות מסייעות ותמיכה בדפוס השימוש המקובל להפעלה עם מקלדת בעזרת מקשי החיצים, Enter ו-Esc ליציאה מתפריטים וחלונות.', 'מותאם לתצוגה בדפדפנים הנפוצים ולשימוש בטלפון הסלולרי.', 'לשם קבלת חוויית גלישה מיטבית עם תוכנת הקראת מסך, אנו ממליצים לשימוש בתוכנת NVDA העדכנית ביותר.', 'ייעוץ הנגשת אתר האינטרנט בוצע על ידי חברת A-2-Z נגישות ושיווק באינטרנט.'])}
+    </section>
+    <section class="mt-10">${h2('בקשות והצעות לשיפור')}
+      <div class="space-y-3 text-base leading-relaxed text-neutral-700">
+        <p>יש לציין כי אנו ממשיכים במאמצים לשפר את נגישות החברה כחלק ממחויבותנו לאפשר לכלל האוכלוסייה, כולל אנשים עם מוגבלויות, לקבל את השירות הנגיש ביותר.</p>
+        <p>במידה ונתקלת בבעיה או בתקלה כלשהי בנושא הנגישות, נשמח שתעדכן אותנו, ואנו נעשה כל מאמץ למצוא עבורך פתרון מתאים ולטפל בתקלה בהקדם ככל שניתן.</p>
+      </div>
+    </section>
+    <section class="mt-10">${h2('פניות בנושא נגישות')}
+      <div class="rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-base leading-relaxed text-neutral-700 sm:p-6">
+        <p class="mb-3">לפניות, הערות ובקשות בנושא נגישות ניתן לפנות אל:</p>
+        <dl class="space-y-1.5">
+          <div class="flex gap-2"><dt class="font-semibold text-neutral-900">שם:</dt><dd>ליאור צדקיהו</dd></div>
+          <div class="flex gap-2"><dt class="font-semibold text-neutral-900">טלפון:</dt><dd><a href="tel:1700704100" class="text-blue-600 hover:underline" dir="ltr">1-700-704-100</a></dd></div>
+          <div class="flex gap-2"><dt class="font-semibold text-neutral-900">דוא״ל:</dt><dd><a href="mailto:liort@adi-system.co.il" class="text-blue-600 hover:underline" dir="ltr">liort@adi-system.co.il</a></dd></div>
+        </dl>
+      </div>
+    </section>`);
+}
+
+function renderTerms() {
+  document.title = 'תנאי שימוש | א.ד.י. מערכות';
+  return legalShell('תנאי שימוש', 'א.ד.י. מערכות סטריאו ואזעקות לרכב בע״מ <span class="text-neutral-400">("העסק")</span>', numbered([
+    ['כללי', ['אנו מודים לך על העניין שגילית בשירות הנזכר באתר אותו העסק מספק ועל ביקורך באתר.', 'השימוש באתר מעיד על הסכמתך לתנאי השימוש ככתבם וכלשונם, המהווים הסכם מחייב בינך ובין העסק לכל דבר, כי קראת אותם ואתה מתחייב לפעול לפיהם וכי הינך למעלה מגיל 18.', 'אם אינך מסכים לתנאי השימוש ו/או אם אינם רלוונטיים עבורך מכל סיבה שהיא, אנא הימנע משימוש באתר או פנה אלינו ישירות כדי שנוכל לעשות כל שביכולתנו כדי לסייע לך בדרכים אחרות.', 'העסק שומר לעצמו את הזכות לשנות, למחוק ו/או להוסיף על תנאי השימוש בכל עת וללא מתן הודעה מוקדמת ו/או בדיעבד וכל תוספת ו/או שינוי כאמור יחייבו אותך עם המשך שימושך באתר לאחר ביצועם.', 'העסק שומר לעצמו את הזכות לשנות את האתר, תכולתו, עיצובו ו/או אופן פעולתו על פי שיקול דעתו המוחלט וללא כל צורך ליתן הודעה מראש ו/או בדיעבד למשתמש/לקוח.', 'העסק רשאי לחסום בפני כל משתמש ו/או לקוח את השימוש באתר על פי שיקול דעתו הבלעדי וללא כל הודעה מוקדמת.']],
+    ['העסקה, הזמנת מוצרים מהעסק באמצעות האתר ואספקתם', ['העסק שומר לעצמו את הזכות עם מי להתקשר בעסקה בהתאם לשיקול דעתו ובכפוף לכל דין.', 'האתר פועל כחנות דיגיטלית לשיווק ו/או אספקת המוצרים הנזכרים בו בתנאים המסחריים המפורטים בו. עלויות המשלוח הינן כמפורט באתר ו/או תלויות באזור האספקה ו/או במהות המוצר.', 'העסקה ואספקת המוצר המוזמן כפופים למסמכי ההזמנה ו/או להסכמה פרטנית אחרת; במידה ולא ניתן לספק מוצר כלשהו (בשל מזג אוויר, מחסור או בעיה באספקה, זמינות במלאי, מצב בטחוני או משבר וכיו"ב), העסק רשאי להודיע על ביטול העסקה תוך 5 ימי עסקים מאישור העסקה בהודעה לרוכש בדוא"ל ו/או בטלפון.', 'ההזמנה כפופה לאישור חברת האשראי הרלוונטית את העסקה מראש.']],
+    ['נכונות הפרטים הנמסרים על ידך והשימוש בהם', ['שימושך באתר ו/או פנייתך אל העסק ו/או ביצוע הזמנה באתר כפופים למסירת פרטי זיהוי מלאים, מספר תעודת זהות, איש קשר, כתובת והתקשרות וכן למסירת פרטי אמצעי תשלום וכן לאישור חברת האשראי הרלוונטית את העסקה מראש.', 'הפרטים הנמסרים על ידך ישמרו בעסק כנהוג וכמקובל וייעשה בהם כל שימוש לרבות לצורך משלוח דיוור ישיר ו/או דברי פרסומת ו/או פרטים ביחס למבצעים ו/או לשירותים המוצעים בעסק ו/או באתר, אלא אם תודיע לנו בכתב, כי אינך מסכים שנפנה אליך, בכפוף לכל דין החל על הנושא בישראל.', 'אתה מסכים ומתחייב, כי הפרטים שנמסרו על ידך מלאים, נכונים ומדוייקים וידוע לך שהעסק ו/או מי מטעמו לא יהיו אחראיים לכל אובדן או נזק הנובעים מאי עמידתך בדרישות לעיל.', 'בכפוף לכל דין החל בעניין, לא נעביר את הפרטים שנמסרו על ידך ללא הסכמתך לצד שלישי, למעט פרטים שיהא עלינו למסור לחברת הסליקה הרלוונטית עימה ו/או באמצעותה העסק ו/או האתר פועלים ו/או פרטים שיש למסור בהתאם לצו שיפוטי ו/או בהתאם לדרישת ו/או צו של רשות מוסמכת רלוונטית.']],
+    ['ביטול עסקה על ידי הלקוח', ['כמפורט במדיניות ביטול עסקה.']],
+    ['זמינות ופעילות האתר', ['מבלי לגרוע מהאמור, העסק עושה מאמצים רבים לגרום לכך שהאתר יהיה מעודכן, בטוח, זמין ונגיש לשימוש, בכפוף לשעות וימי העבודה בעסק. האתר אינו חסין מתקלות ו/או בעיות ואנו נעשה כל שביכולתנו לטפל בהן ולתקן אותן ללא דיחוי. העסק ו/או מי מטעמו לא יהא אחראי כלפיך ו/או כלפי כל צד שלישי, בכל דרך שהיא, לכל שינוי, הפסקה זמנית, השעיה או הפסקה לצמיתות של האתר ו/או תוכנו ושומר על זכותו לשנות, להשעות או להפסיק את האתר (בכללותו או בחלקו), בכל עת, עם או ללא הודעה מוקדמת.']],
+    ['קניין רוחני', ['בכפוף לדין החל על קניין רוחני בישראל, זכויות הקניין הרוחני, לרבות זכויות יוצרים, פטנטים, סימני מסחר וסודות מסחריים, באתר, בעיצובו ובתוכנו וכיו"ב, בבעלות העסק, לפי העניין. אין להעתיק, לשכפל, להפיץ כל חומר מתוך האתר ללא אישור בכתב של העסק.']],
+    ['הגבלת אחריות', ['תוכן האתר ו/או השימוש בו אינם יכולים לשמש בסיס לצורך קבלת החלטות עסקיות, כספיות, משפטיות, אישיות ו/או אחרות. כל פעולה שנעשית על-ידך בהתבסס על תוכן האתר נעשית לפי שיקול דעתך ובאחריותך בלבד.', 'האתר ותוכנו ניתנים לשימוש AS IS ללא כל התחייבות או אחריות העסק ו/או מי מטעמו לתוכן וידוע לך שחלק מהתוכן מקורו בצדדי ג\' שלעסק ו/או למי מטעמו אין ולא יכולה להיות שליטה עליהם.', 'בשום מקרה לא תהיה לעסק ו/או מי מטעמו אחריות כלפיך או כלפי צד שלישי כלשהו, במישרין או בעקיפין, עבור כל אובדן, נזק, הפסד, או לכל נזק ישיר ו/או עקיף הנובע מצדדי ג\' שלעסק ו/או מי מטעמו אין ולא יכולה להיות שליטה עליהם.', 'האחריות הניתנת למוצרים היא כמפורט בתעודת האחריות הרלוונטית.', 'התמונות באתר הן להמחשה בלבד.']],
+    ['דין ושיפוט', ['מבלי לגרוע מהאמור, על כל שימוש באתר ו/או כל תביעה, דרישה או בקשה הנובעים ממנו ו/או מכל דבר ועניין אחר הקשורים באופן ישיר או עקיף לאתר זה ו/או לשירותים המסופקים על ידי העסק במסגרתו יחולו דיני מדינת ישראל בלבד. מקום השיפוט יהיה בבית המשפט לו הסמכות במחוז המרכז והדין המהותי והפרוצדוראלי שיחול יהיה הדין הישראלי.']],
+  ]) + contactBox('9. יצירת קשר', 'בכל שאלה או בעיה הנוגעים לשימוש באתר ניתן לפנות אל העסק:') + `</div>`);
+}
+
+function renderPrivacy() {
+  document.title = 'מדיניות הגנת המידע ופרטיות | א.ד.י. מערכות';
+  return legalShell('מדיניות הגנת המידע ופרטיות', 'א.ד.י. מערכות סטריאו ואזעקות לרכב בע״מ <span class="text-neutral-400">("א.ד.י")</span>', numbered([
+    ['כללי', ['א.ד.י. מערכות סטריאו ואזעקות לרכב בע"מ (להלן: "א.ד.י") מכבדת את פרטיות המשתמשים באתריה ו/או בנכסיה הדיגיטליים ולהלן תתכבד לפרט את מדיניותה ביחס להגנת המידע ופרטיות (להלן: "המדיניות") שחלה ו/או תחול בקשר להגנה על כל מידע אישי, מכל סוג, שא.ד.י. אוספת, מעבדת, שומרת ומשתפת במהלך פעילותה העסקית, לרבות (אך לא רק) באמצעות אתרי אינטרנט, יישומים, ממשקים אלקטרוניים לסוגיהם וכל נכס דיגיטלי שהוא (להלן לשם הנוחות: "הנכסים"). בהמשך כתב זה תפורטנה גם זכויות מסוימות העומדות למשתמשים לפי חוק הגנת הפרטיות, התשמ"א-1981.', 'המדיניות עשויה להתעדכן מעת לעת, והעדכונים והשינויים ייכנסו לתוקף, יפורסמו ויעודכנו במסגרת הנכסים. המשך השימוש של המשתמש בשירותים לאחר עדכון מדיניות הפרטיות ייחשב הסכמה מצדו למדיניות הפרטיות המעודכנת, לרבות לשינויים.', 'בכל דבר ו/או עניין, שאלה, הערה וכיו"ב בקשר למדיניות ניתן ליצור קשר עם א.ד.י. מערכות סטריאו ואזעקות לרכב בע"מ, אליהו איתן 1 ראשון לציון.']],
+    ['עקרונות', ['בעת שימוש בנכסים נאסף מידע על המשתמש. חלק מהמידע נמסר ביודעין ו/או מזהה את המשתמש אישית בשמו ובכתובתו, במספר הטלפון שלו (קווי או נייד), בכתובת הדוא"ל שלו, במספר תעודת הזהות שלו או במספר התאגיד שלו, בשימושו בנכסים ובטיב ואופן השימוש, אמצעי תשלום בהם נעשה שימוש, מידע נוסף שהמשתמש יבחר למסור בטפסים או בהרשמות בנכסים וכיו"ב. חלק מהמידע הינו סטטיסטי ומצטבר ואינו מזהה את המשתמש אישית ואינו נשמר ביחד עם פרטי המשתמש, כגון תכנים שנקראו, העמודים שנצפו, כתובת האינטרנט (IP) שממנה נעשו פניות ועוד.', 'א.ד.י. מחויבת לכך שהמידע האישי של המשתמש ופרטיותו יהיו מוגנים בהתאם לחובות שחלות עליה לפי הדין. מדיניות זו מסבירה את זכויות המשתמש לגבי המידע האישי שא.ד.י אוספת, מעבדת ושומרת במהלך פעילותה העסקית באמצעות הנכסים ולגבי שימוש שלה באמצעי הגנה בכדי להגן על מידע זה.', 'א.ד.י. פועלת כדי שהמידע האישי של המשתמש ייאסף, יישמר ויאוחסן אצלה בהתאם לכל דין, בהגינות, שקיפות, תום לב ומידתיות, תוך נקיטה בפעולות המתאימות ותוך שאיפה להקטנת הסיכונים העשויים להתרחש כתוצאה מתהליכי עיבוד המידע.', 'איסוף, עיבוד ושימוש במידע האישי של המשתמש עשוי להתבצע על ידי צדדים שלישיים שפועלים מטעמה של א.ד.י. במהלך העסקים השוטף שלה ו/או תוך כדי מתן השירותים על ידה.']],
+    ['הטעמים לשימוש במידע האישי', ['א.ד.י. משתמשת במידע האישי של המשתמש כדי לספק למשתמש את השירותים שהוא מבקש, כדי לעבד את הבקשות שלו ואת השימוש שלו במסגרת הנכסים, כדי לשפר את חוויית המשתמש שלו ולפתח שירותים נוספים, וכן כדי להציע למשתמש שירותים נוספים, לשלוח לו עדכונים, הודעות, דברי פרסומת וכיו"ב, כפוף להסכמתו. כמו כן א.ד.י. אוספת את המידע האישי של המשתמש לשם תחזוקה של השירותים, ניטור פעילות המשתמש בנכסים, שיפור איכות השירותים, יצירת קשר עם המשתמש, עריכת נתונים סטטיסטיים, ניתוח, מחקר והעברת מידע (לרבות סטטיסטי) לצדדים שלישיים, עריכת סקרים, התאמת מודעות שיוצגו למשתמשים ועשויים להתאים להעדפותיהם, ניתוח פרופילים של המשתמשים לשם שיווק מוצרים, לצרכי דיוור ישיר, לצרכים פנימיים של א.ד.י., לשם התגוננות מפני תביעות, דרישות וטענות נגד א.ד.י. ומי מטעמה וכן נגד צדדים שלישיים, לשם אכיפה של הוראות המדיניות, ולשם עמידה בהוראות כל דין.', 'המידע האישי של המשתמש משמש גם עבור קבצי "עוגיות" (Cookies) (וטכנולוגיות דומות) ומעקב נכסים, אתרים ובאפליקציות המאפשרים להבדיל אותו ממשתמשים אחרים, ולשפר את השימוש שלו בממשקים אלה.', 'השימוש ב"עוגיות" (Cookies) וטכנולוגיות דומות נעשה לצורך התפעול השוטף והתקין, ובכלל זה כדי לאסוף ולשמר נתונים סטטיסטיים אודות השימוש בנכסים, לשם אימות פרטי המשתמש, כדי להתאים אותם להעדפות/הגדרות המשתמש ולשלוח עדכונים, הודעות ודברי פרסומת מתאימים, לניתוח סטטיסטי של ביצועי נכסים, ניתוח המגמה, ניטור שגיאות זיהוי ולצורכי אבטחת מידע. "עוגיות" (Cookies) וטכנולוגיות דומות אינם יכולים להתקין תוכנות זדוניות כגון וירוסים במכשיר של המשתמש.', 'מובהר כי באפשרות המשתמש לשלוט ב"עוגיות" (Cookies) וטכנולוגיות דומות ברמת הדפדפן הפרטי וכן להימנע מקבלתם או למחוק את הקבצים הנ"ל. אם המשתמש לא יודע כיצד לעשות זאת, עליו לבדוק זאת באמצעות הדפדפן בו הוא עושה שימוש. השימוש של המשתמש בשירותים ייחשב הסכמה מצדו לשימוש ב"עוגיות" (Cookies) וטכנולוגיות דומות כאמור לעיל עד כמה שהשימוש מתאפשר בשים לב לפעולות שהמשתמש נקט (או לא נקט) ברמת הדפדפן הפרטי שלו, כאמור לעיל.']],
+    ['סוגי המידע האישי שנאסף ומטרות האיסוף והעיבוד', ['המידע האישי של המשתמש שנאסף ו/או מעובד ו/או שבו נעשה שימוש, מוגבל למידע הנחוץ לא.ד.י. כדי לספק למשתמש שירותים במהלך עסקיה, תוך הגנה על המידע וקיום חובות המוטלות על א.ד.י. על-פי דין בקשר לכך. הגישה למידע, הכוללת גם גישה פיזית, מוגבלת לעובדים ולצדדים שלישיים המתקשרים עם א.ד.י., והם משתמשים בו למטרות המפורטות להלן בלבד.', 'המידע שנאסף ומעובד כולל גם מידע כללי המשמש למטרות טכניות ובהתאם לשירותים שא.ד.י. תבחר ותשתמש בהם.', 'עשוי להיות עיבוד ואחסון אוטומטי של מידע אישי של המשתמש. מידע זה כולל גם כתובות IP, סוג הדפדפן, ספק שירותי האינטרנט, דפי הפניה ויציאה, מערכות הפעלה, חותמת תאריך / שעה ונתונים של הקלקות, וא.ד.י עשויה להשתמש בו כדי לנתח מגמות, לנהל את הנכסים, לעקוב אחר תנועות משתמשים דרכם, לאסוף מידע על בסיס המשתמשים בכללותו, ולקשר מידע שנאסף באופן אוטומטי למידע אישי למטרות עסקיות לגיטימיות, כגון איתור ומניעת פעילות הונאה, וכן למטרות אחרות.', 'כאשר שירותים של א.ד.י. מתקבלים אצל המשתמש דרך ו/או באמצעות הנכסים, אפשר ותהיה הפנייה ל"ספקים-צד שלישי" (לדוגמה, ספקי שירות תשלומים, כולל כרטיס אשראי או ספקי תשלום מקוונים ו/או שירותי מיקום, ספק שירותי תמיכה במערכות האבטחה ומערכות טכנולוגיית מידע (IT), ספק שירותי אחסון מידע, ספק שירותי סליקה, ספק שירותי בניית אתרים, ספק שירותי עריכת סקרים ומחקרים, חברות שליחויות, ספק לוגיסטיקה, ספק שירותי פרסום ושיווק, עורכי דין או יועצים מקצועיים חיצוניים אחרים וכן צדדים שלישיים נוספים אשר מעניקים ל-א.ד.י. שירותים בקשר עם פעילותה, וכיו"ב). כאשר א.ד.י משתמשת ב"ספקים-צד שלישי" היא מסתמכת על ספק השירות שמעבד את המידע האישי.', 'א.ד.י. תהיה רשאית להעביר לצד שלישי את המידע האישי של המשתמש במקרה של מיזוג, שינוי שליטה, רכישה או העברת הפעילות של א.ד.י לצד שלישי. העברת המידע האישי בנסיבות אלה תהיה כפופה לכך שמקבל המידע יפעל בהתאם למדיניות כהגדרתה לעיל.', 'יתכנו מצבים בהם א.ד.י. תידרש להעביר את המידע האישי של המשתמש למטרות שתוארו לעיל לצדדים שלישיים, וא.ד.י תהא רשאית לעשות כן בנסיבות הבאות: אם העברת המידע נחוצה לשם פעילות המשתמש בנכסים; אם א.ד.י. נדרשת לעשות זאת על פי כל דין ו/או החוק החל, צו בית המשפט או רגולציה אחרת; או אם העברת המידע אושרה בדרך אחרת ו/או נדרשת בכל חקירה פלילית או משפטית או בכל הליך משפטי או במקרה שהמשתמש פעל בנכסים בניגוד לדין. בנוסף א.ד.י. תהיה רשאית להעביר לצד שלישי את המידע האישי של המשתמש בכל מחלוקת, טענה, דרישה, תביעה או הליכים משפטיים כלשהם בין המשתמש או מי מטעמו לבין א.ד.י. ומי מטעמה.', 'אם תועלה טענה או יתעורר אצל א.ד.י. חשד שהמשתמש ביצע מעשה או מחדל שעשויים לפגוע בה, במי מטעמה, ובצדדים שלישיים כלשהם, לרבות משתמשים אחרים, וכן אם תועלה טענה או יתעורר אצל א.ד.י. חשד שמשתמש עושה שימוש בנכסים לצורך ביצוע מעשה בלתי חוקי או כדי לאפשר, להקל, לסייע, לעודד את ביצועו של מעשה כזה — א.ד.י. תהיה רשאית להעביר את המידע האישי של המשתמש לצד שלישי. כמו כן היא תהיה רשאית לעשות זאת במקרה שתסבור כי מסירת המידע האישי נדרשת כדי למנוע נזק לה, למשתמש או לצד שלישי כלשהו.', 'א.ד.י. וכל מי מטעמה לא יישאו בכל חבות, והם פטורים מכל אחריות, בקשר עם כל נזק, הפסד והוצאה, מכל מין וסוג שהם, בין אם ישירים ובין אם עקיפים, נסיבתיים ותוצאתיים, אשר ייגרמו למשתמש ולצד שלישי בכל הקשור והנוגע ל"ספק-צד שלישי" ולצד שלישי אחר, לרבות בכל הקשור לאיסוף המידע על ידי "ספק-צד שלישי" וצד שלישי אחר, השימוש בו, העברתו לצדדים נוספים, שמירתו, אבטחתו ועוד.']],
+    ['ההגנה על המידע האישי של המשתמש ופרטיותו', ['א.ד.י נוקטת בכל האמצעים הטכניים והארגוניים המקובלים כדי למזער סיכונים ו/או להגן על המידע האישי של המשתמש מפני אובדן, חשיפה, שינוי, פגיעה, גניבה או גישה של צדדים שלישיים בלתי מורשים.', 'א.ד.י. לא תמכור, תשתף, תעביר או תשתמש בנתונים שהיא אוספת למטרות אחרות מאלה המפורטות במפורש במדיניות זאת.', 'א.ד.י. תמחק את המידע האישי של המשתמש כאשר המטרה העסקית שעבורה נאסף או מעובד המידע הסתיימה, או אם כללי הגנת המידע (על-פי הדין) יחייבו אותה למחוק מידע אישי זה.', 'יחד עם זאת, אין וודאות שכל האמצעים בהם א.ד.י. נוקטת להגנה על המידע האישי ימנעו גישה ו/או חדירה בלתי-מורשית לנכסים ו/או למידע האישי מצד צדדים שלישיים לא מורשים. מדובר במזעור סיכונים בלבד, וא.ד.י לא מתחייבת שהמידע האישי ו/או שירותיה ו/או הנכסים יהיו חסינים באופן מוחלט בפני גישה בלתי-מורשית. המשתמש מוסר את המידע האישי בהסכמה מלאה ובמודעות לסכנות הכרוכות בהעברת המידע באמצעות הנכסים.', 'א.ד.י. וכל מי מטעמה לא ישאו בכל חבות ויהיו פטורים מכל אחריות בקשר לכל נזק, הפסד, הוצאה ואובדן, עקיפים וישירים, נסיבתיים ותוצאתיים, שייגרמו למשתמש ולצד שלישי בכל הקשור והנוגע לאיסוף המידע, השימוש בו, העברתו לצדדים שלישיים, שמירתו ואבטחתו, כולל אלה הנובעים מחדירה ו/או גישה בלתי מורשית למידע האישי ו/או משימוש לא נאות ו/או מכל מחדל ו/או הפרה של פעולות אבטחה המביא/ה להרס, אובדן, שינוי, גילוי או גישה בלתי מורשית של המידע אישי של המשתמש.', 'אם המשתמש יספק מידע אישי לא.ד.י. בקשר לאנשים אחרים, לרבות בני משפחתו, הוא יעשה זאת רק לאחר שהמשתמש עדכן אותם בדבר המדיניות, וקיבל את הסכמתם למדיניות.']],
+    ['זכויות המשתמש', ['מסירת המידע האישי של המשתמש לא.ד.י. תלויה ברצונו ובהסכמתו של המשתמש, ולא חלה עליו חובה חוקית למסור אותו לא.ד.י. השימוש בשירותים שמציעה א.ד.י. מעידים על הסכמתו של המשתמש למדיניות ולכך שהמידע יישמר וינוהל בהתאם למדיניות. אלא אם היא מורשית או מחויבת חוקית לבצע איסוף/עיבוד כאמור גם מבלי שניתנה הסכמה מצד המשתמש.', 'אם המשתמש לא מסכים למסור את המידע לא.ד.י., ייתכן שהיא לא תוכל לספק לו את כל השירותים שהיא מציעה או את חלקם.', 'המשתמש רשאי לבטל או למשוך את הסכמתו הנ"ל בכל עת וכן לבקש לעיין במידע האישי שא.ד.י אספה/עיבדה ולבקש לתקנו או למחוק אותו (כולו או חלקו) – הכול באמצעות שליחת בקשה לא.ד.י. א.ד.י. תפעל בהתאם לבקשת המשתמש בתוך 30 יום, אלא אם כן היא מחויבת ו/או מורשית על פי כל דין לשמור על המידע ו/או באם יש לה אינטרס לגיטימי כלשהו (על-פי דין) שלא לעשות כן ובכפוף לשיקולים טכניים.']],
+  ]) + contactBox('יצירת קשר', 'לשאלות בנוגע למדיניות, או לבקשה לעיין במידע, לתקן אותו או למחוק אותו, ניתן לפנות אל א.ד.י:') + `
+    <p class="mt-6 text-sm text-neutral-500">המדיניות כתובה בלשון זכר-יחיד רק מטעמי נוחות. יש לראות בכתוב כמתייחס גם ללשון נקבה וללשון רבים/רבות.</p>
+  </div>`);
+}
+const LEGAL = { accessibility: renderAccessibility, terms: renderTerms, privacy: renderPrivacy };
+
+// ───── Accessibility widget (same options as the Kia site; remembered per device) ─────
+const A11Y_KEY = 'a11y_settings';
+const a11yDefaults = { fontScale: 0, highContrast: false, highlightLinks: false, readableFont: false, reducedMotion: false };
+const a11yToggles = [['highContrast', 'ניגודיות גבוהה'], ['highlightLinks', 'הדגשת קישורים'], ['readableFont', 'גופן קריא'], ['reducedMotion', 'ביטול אנימציות']];
+let a11y = { ...a11yDefaults };
+try { a11y = { ...a11yDefaults, ...JSON.parse(localStorage.getItem(A11Y_KEY) || '{}') }; } catch {}
+function applyA11y() {
+  const html = document.documentElement;
+  html.style.setProperty('--a11y-font-scale', String([1, 1.125, 1.25, 1.5, 1.75][a11y.fontScale] ?? 1));
+  html.classList.toggle('a11y-high-contrast', a11y.highContrast);
+  html.classList.toggle('a11y-highlight-links', a11y.highlightLinks);
+  html.classList.toggle('a11y-readable-font', a11y.readableFont);
+  html.classList.toggle('a11y-reduced-motion', a11y.reducedMotion);
+  document.getElementById('a11yFont').textContent = [100, 112.5, 125, 150, 175][a11y.fontScale] + '%';
+  document.querySelector('[data-a11y="font-"]').disabled = a11y.fontScale === 0;
+  document.querySelector('[data-a11y="font+"]').disabled = a11y.fontScale === 4;
+  document.getElementById('a11yToggles').innerHTML = a11yToggles.map(([k, label]) => `
+    <button data-a11y="${k}" role="switch" aria-checked="${a11y[k]}" class="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm transition-colors ${a11y[k] ? 'border-blue-300 bg-blue-50 text-blue-900' : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50'}">
+      <span>${label}</span>
+      <span class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${a11y[k] ? 'bg-blue-600' : 'bg-neutral-300'}" dir="ltr"><span class="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${a11y[k] ? 'translate-x-5' : 'translate-x-0.5'}"></span></span>
+    </button>`).join('');
+  try { localStorage.setItem(A11Y_KEY, JSON.stringify(a11y)); } catch {}
+}
+applyA11y();
+const a11yPanel = document.getElementById('a11yPanel');
+document.addEventListener('click', e => {
+  if (e.target.closest('#a11yBtn')) { a11yPanel.classList.toggle('hidden'); return; }
+  if (e.target.closest('#a11yClose') || e.target.closest('#a11yPanel a')) { a11yPanel.classList.add('hidden'); return; }
+  const b = e.target.closest('[data-a11y]');
+  if (!b) return;
+  const k = b.dataset.a11y;
+  if (k === 'font-') a11y.fontScale = Math.max(0, a11y.fontScale - 1);
+  else if (k === 'font+') a11y.fontScale = Math.min(4, a11y.fontScale + 1);
+  else if (k === 'reset') a11y = { ...a11yDefaults };
+  else a11y[k] = !a11y[k];
+  applyA11y();
+});
+
+// ───── Cookie consent (same flow + texts as the Kia site) ─────
+// Stored in a first-party cookie for 12 months. Analytics may fire only if hasConsentFor('statistics').
+const CONSENT_COOKIE = 'cookie_consent', CONSENT_VERSION = 1;
+function getConsent() {
+  try {
+    const m = document.cookie.match(new RegExp(`(?:^|;\\s*)${CONSENT_COOKIE}=([^;]+)`));
+    if (!m) return null;
+    const c = JSON.parse(decodeURIComponent(m[1]));
+    return c && c.version === CONSENT_VERSION && typeof c.statistics === 'boolean' ? c : null;
+  } catch { return null; }
+}
+function setConsent(statistics, marketing) {
+  const state = { functional: true, statistics, marketing, version: CONSENT_VERSION, decidedAt: new Date().toISOString() };
+  document.cookie = [`${CONSENT_COOKIE}=${encodeURIComponent(JSON.stringify(state))}`, 'path=/', `max-age=${60 * 60 * 24 * 365}`, 'samesite=lax',
+    location.protocol === 'https:' ? 'secure' : ''].filter(Boolean).join('; ');
+  window.dispatchEvent(new CustomEvent('cookie-consent-changed', { detail: state }));
+}
+const hasConsentFor = cat => !!(getConsent() || {})[cat];
+
+const cookieRoot = document.getElementById('cookieRoot');
+const COOKIE_TEXT = 'האתר שלנו משתמש בעוגיות (Cookies) כדי לשפר את חוויית הגלישה, לנתח את השימוש באתר ולהתאים עבורך תוכן ושירות. באפשרותך לבחור לאשר את כל העוגיות או להגדיר את ההעדפות שלך.';
+const cookieIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01M16 15.5v.01M12 12v.01M11 17v.01M7 14v.01"/></svg>';
+const btnGhost = 'rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50';
+const btnMain = 'rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700';
+const cookieActions = extra => `${extra}
+  <button type="button" data-cookie="reject" class="${btnGhost}">דחה עוגיות לא חיוניות</button>
+  <button type="button" data-cookie="all" class="${btnMain}">מאשר את כל העוגיות</button>`;
+let cookiePrefs = { statistics: false, marketing: false };
+const cookieSwitch = key => `<button type="button" data-cookie="toggle" data-key="${key}" role="switch" aria-checked="${cookiePrefs[key]}" dir="ltr"
+  class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${cookiePrefs[key] ? 'bg-emerald-500' : 'bg-neutral-300'}">
+  <span class="inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${cookiePrefs[key] ? 'translate-x-6' : 'translate-x-1'}"></span></button>`;
+const cookieCat = (key, title, text) => `
+  <div class="p-4 sm:p-5">
+    <div class="flex items-center justify-between gap-3">
+      <button type="button" data-cookie="details" class="flex items-center gap-2 text-right font-semibold" aria-expanded="false"><span class="text-xs text-neutral-400">▼</span>${title}</button>
+      ${cookieSwitch(key)}
+    </div>
+    <p class="mt-2 hidden text-xs leading-relaxed text-neutral-500">${text}</p>
+  </div>`;
+
+function renderCookieBanner() {
+  cookieRoot.innerHTML = `
+  <div class="pointer-events-none fixed inset-x-0 bottom-0 z-[9998] flex justify-center p-3 sm:p-4" style="padding-bottom:calc(.75rem + env(safe-area-inset-bottom, 0px))">
+    <div class="pointer-events-auto w-full max-w-2xl rounded-xl border border-neutral-200 bg-white p-4 shadow-2xl sm:p-5" role="region" aria-label="שימוש בעוגיות">
+      <div class="flex items-start gap-3">
+        <div class="shrink-0 rounded-lg bg-amber-50 p-2 text-amber-600">${cookieIcon}</div>
+        <div class="min-w-0 flex-1">
+          <h2 class="mb-1 text-base font-bold sm:text-lg">שימוש בעוגיות</h2>
+          <p class="text-sm leading-relaxed text-neutral-600">${COOKIE_TEXT}</p>
+        </div>
+        <button type="button" data-cookie="reject" aria-label="דחה ועצור עוגיות לא חיוניות" class="shrink-0 rounded-md p-1 text-xl leading-none text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600">✕</button>
+      </div>
+      <div class="mt-4 flex flex-wrap items-center justify-end gap-2">${cookieActions(`<button type="button" data-cookie="prefs" class="${btnGhost}">נהל העדפות</button>`)}</div>
+    </div>
+  </div>`;
+}
+function renderCookiePrefs() {
+  cookieRoot.innerHTML = `
+  <div class="fixed inset-0 z-[9999] flex items-end justify-center bg-black/50 p-3 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="cookiePrefsTitle">
+    <div class="flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
+      <div class="flex items-start gap-3 border-b border-neutral-200 p-4 sm:p-5">
+        <div class="min-w-0 flex-1">
+          <h2 id="cookiePrefsTitle" class="mb-1 text-base font-bold sm:text-lg">שימוש בעוגיות</h2>
+          <p class="text-sm leading-relaxed text-neutral-600">${COOKIE_TEXT}</p>
+        </div>
+        <button type="button" data-cookie="close" aria-label="סגור" class="shrink-0 rounded-md p-1 text-xl leading-none text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600">✕</button>
+      </div>
+      <div class="flex-1 divide-y divide-neutral-200 overflow-y-auto">
+        <div class="p-4 sm:p-5">
+          <div class="mb-2 flex items-center justify-between gap-3"><span class="font-semibold">פונקציונלי</span><span class="text-xs font-medium text-emerald-600">פעיל תמיד</span></div>
+          <p class="text-xs leading-relaxed text-neutral-500">עוגיות חיוניות לפעולת האתר — שמירת הבחירות שלך בנושא עוגיות והגדרות הנגישות. ניתן לחסום אותן רק ברמת הדפדפן ויידרש לכך שינוי הגדרות.</p>
+        </div>
+        ${cookieCat('statistics', 'סטטיסטיקה', 'עוגיות אלו עוזרות לנו להבין איך משתמשים גולשים באתר — אילו דפים נצפים, כמה זמן נשארים, וזה ניתן לעיבוד מצטבר (ולא ברמת זהות אישית). המידע נאסף באופן אנונימי ומשמש לשיפור חוויית המשתמש.')}
+        ${cookieCat('marketing', 'שיווק', 'עוגיות שיווק (לא בשימוש כיום באתר זה, נשמרות כהעדפה לעתיד) משמשות להצגת מודעות מותאמות אישית ומדידת אפקטיביות של קמפיינים שיווקיים.')}
+      </div>
+      <div class="flex flex-wrap items-center justify-end gap-2 border-t border-neutral-200 p-4 sm:p-5">${cookieActions(`<button type="button" data-cookie="save" class="${btnGhost}">שמור העדפות</button>`)}</div>
+    </div>
+  </div>`;
+}
+function openCookiePrefs() {
+  const c = getConsent();
+  cookiePrefs = { statistics: !!(c && c.statistics), marketing: !!(c && c.marketing) };
+  renderCookiePrefs();
+}
+function closeCookieUI() { if (getConsent()) cookieRoot.innerHTML = ''; else renderCookieBanner(); }
+cookieRoot.addEventListener('click', e => {
+  const b = e.target.closest('[data-cookie]');
+  if (!b) return;
+  const a = b.dataset.cookie;
+  if (a === 'all') { setConsent(true, true); cookieRoot.innerHTML = ''; }
+  else if (a === 'reject') { setConsent(false, false); cookieRoot.innerHTML = ''; }
+  else if (a === 'save') { setConsent(cookiePrefs.statistics, cookiePrefs.marketing); cookieRoot.innerHTML = ''; }
+  else if (a === 'prefs') openCookiePrefs();
+  else if (a === 'close') closeCookieUI();
+  else if (a === 'toggle') { cookiePrefs[b.dataset.key] = !cookiePrefs[b.dataset.key]; renderCookiePrefs(); }
+  else if (a === 'details') {
+    const p = b.closest('.p-4').querySelector('p');
+    p.classList.toggle('hidden');
+    b.setAttribute('aria-expanded', String(!p.classList.contains('hidden')));
+    b.querySelector('span').textContent = p.classList.contains('hidden') ? '▼' : '▲';
+  }
+});
+document.getElementById('cookiePrefsLink').addEventListener('click', openCookiePrefs);
+if (!getConsent()) renderCookieBanner();
+
+// ───── Analytics (same model as the Kia site: Supabase table, visitors can only add rows) ─────
+// Supabase project "trade-mobile" (ADI System org). Table + rules: trade-mobile-catalog\supabase\analytics.sql
+// The publishable key is meant to be public; reading the data needs an admin login (see #admin).
+const SUPABASE_URL = 'https://arqprdrhpepgqzuyjomm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_6gPWKXY6DJ57t8UZILieSQ_B6k7I4Qd';
+const TRACK_ON_HOST = !/^(localhost|127\.0\.0\.1)$|claude/.test(location.hostname);
+function sessionId() {
+  try {
+    let id = sessionStorage.getItem('analytics_session_id');
+    if (!id) { id = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)); sessionStorage.setItem('analytics_session_id', id); }
+    return id;
+  } catch { return 'no-storage'; }
+}
+const deviceType = () => innerWidth < 768 ? 'mobile' : innerWidth < 1024 ? 'tablet' : 'desktop';
+function trackEvent(eventType, data = {}) {
+  if (!SUPABASE_URL || !TRACK_ON_HOST || !hasConsentFor('statistics')) return;
+  try {
+    fetch(`${SUPABASE_URL}/rest/v1/tm_analytics_events`, {
+      method: 'POST', keepalive: true,
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ event_type: eventType, page: data.page || null, product: data.product || null, session_id: sessionId(),
+        device_type: deviceType(), referrer: (document.referrer || '').slice(0, 500) || null, metadata: data.metadata || {} }),
+    }).catch(() => {});
+  } catch { /* analytics must never break the page */ }
+}
+let lastTracked = '';
+function trackPage() {
+  const h = location.hash.slice(1);
+  if (h === 'admin') return;
+  const path = !h || h === 'home' || h === 'products' ? '/' : '/' + h;
+  if (path === lastTracked) return;
+  lastTracked = path;
+  if (h.startsWith('p-')) trackEvent('product_view', { page: path, product: h.slice(2) });
+  else trackEvent('page_view', { page: path });
+}
+window.addEventListener('cookie-consent-changed', () => { lastTracked = ''; trackPage(); });
+
+// Time spent in a product window (sent when it closes, like Kia: only 3 seconds and up)
+let dwell = null;
+function startDwell(slug) { endDwell(); dwell = { slug, start: Date.now() }; }
+function endDwell() {
+  if (!dwell) return;
+  const ms = Date.now() - dwell.start, slug = dwell.slug;
+  dwell = null;
+  if (ms >= 3000) trackEvent('dwell_time', { page: '/p-' + slug, product: slug, metadata: { duration_seconds: Math.min(3600, Math.round(ms / 1000)) } });
+}
+// Leaving the site / switching app while a product is open also ends the visit to it
+addEventListener('pagehide', endDwell);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && dwell) { const slug = dwell.slug; endDwell(); dwell = { slug, start: Infinity }; }
+  else if (document.visibilityState === 'visible' && dwell && dwell.start === Infinity) dwell.start = Date.now();
+});
+
+// Scroll depth 25/50/75/100% (like Kia), once per page view; product windows are measured inside the window
+let scrollSeen = { key: '', marks: new Set() };
+function trackScroll(key, el) {
+  const max = el ? el.scrollHeight - el.clientHeight : document.documentElement.scrollHeight - innerHeight;
+  if (max <= 0) return;
+  const pct = (el ? el.scrollTop : scrollY) / max * 100;
+  if (scrollSeen.key !== key) scrollSeen = { key, marks: new Set() };
+  [[25, 25], [50, 50], [75, 75], [100, 95]].forEach(([mark, need]) => {
+    if (pct >= need && !scrollSeen.marks.has(mark)) {
+      scrollSeen.marks.add(mark);
+      trackEvent('scroll_depth', { page: key, product: key.startsWith('/p-') ? key.slice(3) : null, metadata: { depth: mark } });
+    }
+  });
+}
+let scrollTimer = 0;
+addEventListener('scroll', () => {
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(() => { if (!dwell && location.hash !== '#admin') trackScroll(lastTracked || '/'); }, 150);
+}, { passive: true });
+
+// ───── Hamburger menu ─────
+const drawer = document.getElementById('drawer'), scrim = document.getElementById('scrim');
+const menuLink = (href, icon, label, color, extra = '') =>
+  `<a href="${href}" ${extra} class="flex items-center gap-3 rounded-xl px-3 py-3 font-medium hover:bg-neutral-50">
+     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style="background:${color[0]};color:${color[1]}">${svg(icon, 'h-5 w-5', 2)}</span>${label}</a>`;
+document.getElementById('menuList').innerHTML = `
+  ${menuLink('#home', 'home', 'דף הבית', ['#f5f5f5', '#404040'])}
+  <div class="px-3 pb-1 pt-4 text-xs font-bold text-neutral-400">המוצרים</div>
+  ${items.map(it => menuLink('#p-' + it.slug, it.icon, it.title, ['#f5f5f5', '#404040'])).join('')}
+  <div class="my-3 border-t border-neutral-100"></div>
+  ${menuLink('#reps', 'users', 'מידע לנציגים', ['#f5f5f5', '#404040'])}`;
+function openMenu()  { drawer.classList.remove('translate-x-full'); scrim.classList.remove('hidden'); }
+function closeMenu() { drawer.classList.add('translate-x-full'); scrim.classList.add('hidden'); }
+
+// ───── Product-sheet viewer: shows the sheet as a sharp image (rendered from the PDF by Windows' PDF engine) ─────
+const modal = document.getElementById('sheet');
+const sheetImage = url => url.replace(/^sheets\/(.+)\.pdf$/, 'sheets/img/$1-1.jpg');
+function openSheet(url, title) {
+  const img = sheetImage(url);
+  const openProduct = location.hash.startsWith('#p-') ? location.hash.slice(3) : null;
+  trackEvent('sheet_view', { page: location.hash ? '/' + location.hash.slice(1) : '/', product: openProduct, metadata: { sheet: url.split('/').pop(), title } });
+  document.getElementById('sheetTitle').textContent = title;
+  document.getElementById('sheetLink').href = img;
+  document.getElementById('sheetBody').innerHTML =
+    `<div class="mx-auto max-w-3xl p-2 sm:p-4"><img src="${img}" alt="${title} – דף מוצר" class="h-auto w-full rounded-lg bg-white shadow"></div>`;
+  modal.classList.replace('hidden', 'flex');
+  document.body.style.overflow = 'hidden';
+}
+// ───── Copy SKU + small "copied" toast ─────
+const toast = document.createElement('div');
+toast.className = 'pointer-events-none fixed inset-x-0 z-[70] mx-auto w-max rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white opacity-0 shadow-lg transition-opacity duration-300';
+toast.style.bottom = 'calc(1.5rem + env(safe-area-inset-bottom, 0px))';
+toast.setAttribute('role', 'status');
+document.body.appendChild(toast);
+let toastTimer;
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 1800);
+}
+function copySku(sku, btn) {
+  const fallback = () => {
+    const r = document.createRange();
+    r.selectNodeContents(btn.querySelector('[dir="ltr"]'));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    try { document.execCommand('copy'); showToast('המק״ט ' + sku + ' הועתק'); }
+    catch { showToast('סמנו את המק״ט והעתיקו'); }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(sku).then(() => showToast('המק״ט ' + sku + ' הועתק'), fallback);
+  } else fallback();
+}
+
+function closeSheet() {
+  modal.classList.replace('flex', 'hidden');
+  document.getElementById('sheetBody').innerHTML = '';
+  if (itemModal.classList.contains('hidden')) document.body.style.overflow = '';
+}
+
+// ───── Product window: floats over the home page (like the Kia product popup) ─────
+const itemModal = document.createElement('div');
+itemModal.id = 'itemModal';
+itemModal.className = 'fixed inset-0 z-[45] hidden items-center justify-center bg-black/60 p-2 backdrop-blur-[2px] sm:p-6';
+itemModal.setAttribute('role', 'dialog');
+itemModal.setAttribute('aria-modal', 'true');
+document.body.appendChild(itemModal);
+function openItem(slug) {
+  itemModal.innerHTML = `
+    <div class="relative max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+      <button id="itemClose" class="absolute left-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-xl text-neutral-700 hover:bg-neutral-200" aria-label="סגירה">✕</button>
+      ${renderItem(slug, true)}
+    </div>`;
+  itemModal.classList.replace('hidden', 'flex');
+  itemModal.firstElementChild.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+  startDwell(slug);
+  let t = 0;
+  itemModal.firstElementChild.addEventListener('scroll', e => {
+    clearTimeout(t);
+    t = setTimeout(() => trackScroll('/p-' + slug, e.target), 150);
+  }, { passive: true });
+}
+function closeItem() {
+  if (itemModal.classList.contains('hidden')) return;
+  endDwell();
+  itemModal.classList.replace('flex', 'hidden');
+  itemModal.innerHTML = '';
+  document.body.style.overflow = '';
+  document.title = 'אדי × טרייד מוביל';
+}
+// Closing the window goes back to the home page, keeping the scroll position
+function leaveItem() { history.replaceState(null, '', '#home'); closeItem(); lastTracked = '/'; }
+
+document.addEventListener('click', e => {
+  const cp = e.target.closest('[data-copy]');
+  if (cp) { copySku(cp.dataset.copy, cp); return; }
+  const ph = e.target.closest('[data-photo]');
+  if (ph) {
+    document.getElementById('mainPhoto').src = ph.dataset.photo;
+    ph.parentElement.querySelectorAll('[data-photo]').forEach(x => x.classList.replace('border-neutral-900', 'border-transparent'));
+    ph.classList.replace('border-transparent', 'border-neutral-900');
+    return;
+  }
+  const b = e.target.closest('[data-sheet]');
+  if (b) return openSheet(b.dataset.sheet, b.dataset.title);
+  if (e.target === modal || e.target.closest('#sheetClose')) return closeSheet();
+  if (e.target === itemModal || e.target.closest('#itemClose')) return leaveItem();
+  if (e.target.closest('#menuBtn')) return openMenu();
+  if (e.target === scrim || e.target.closest('#menuClose')) return closeMenu();
+  const s = e.target.closest('[data-scroll]');
+  if (s) {
+    e.preventDefault(); closeMenu();
+    if (location.hash && location.hash !== '#home') location.hash = 'home';
+    setTimeout(() => document.getElementById(s.dataset.scroll)?.scrollIntoView({ behavior: 'smooth' }), 60);
+    return;
+  }
+  if (e.target.closest('#drawer a')) closeMenu();
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (modal.classList.contains('flex')) closeSheet(); else leaveItem();
+  closeMenu();
+});
+
+// ───── Analytics page for ADI only (#admin, not linked anywhere; needs a Supabase login listed in tm_admins) ─────
+let sb = null, adminDays = 30;
+function loadSupabase() {
+  if (sb) return Promise.resolve(sb);
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+    s.onload = () => { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); res(sb); };
+    s.onerror = () => rej(new Error('load'));
+    document.head.appendChild(s);
+  });
+}
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const adminCard = (title, body, cls = '') => `<div class="rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5 ${cls}"><h2 class="mb-3 text-base font-bold text-neutral-900">${title}</h2>${body}</div>`;
+const adminWrap = body => `<div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">${body}</div>`;
+
+function renderAdmin() {
+  document.title = 'אנליטיקה | אדי × טרייד מוביל';
+  if (!SUPABASE_URL) return adminWrap('<p class="text-neutral-500">האנליטיקה עוד לא מחוברת.</p>');
+  setTimeout(initAdmin, 0);
+  return adminWrap('<div id="adminBody" class="text-neutral-500">טוען…</div>');
+}
+async function initAdmin() {
+  const box = document.getElementById('adminBody');
+  try { await loadSupabase(); } catch { box.textContent = 'לא ניתן לטעון את מערכת הכניסה. נסו לרענן.'; return; }
+  const { data } = await sb.auth.getSession();
+  if (data.session) renderAdminDashboard(); else renderAdminLogin();
+}
+function renderAdminLogin(error = '') {
+  const box = document.getElementById('adminBody');
+  if (!box) return;
+  box.innerHTML = `
+    <form id="adminLogin" class="mx-auto mt-6 max-w-sm space-y-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <h1 class="text-2xl font-bold text-neutral-900">כניסה לאנליטיקה</h1>
+      <label class="block text-sm font-medium text-neutral-700">דוא״ל
+        <input name="email" type="email" required autocomplete="username" dir="ltr" class="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-base focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></label>
+      <label class="block text-sm font-medium text-neutral-700">סיסמה
+        <input name="password" type="password" required autocomplete="current-password" dir="ltr" class="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-base focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></label>
+      ${error ? `<p class="text-sm text-red-600">${esc(error)}</p>` : ''}
+      <button class="w-full rounded-lg bg-blue-600 py-2.5 font-semibold text-white hover:bg-blue-700">כניסה</button>
+    </form>`;
+  document.getElementById('adminLogin').addEventListener('submit', async e => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    e.target.querySelector('button').textContent = 'מתחבר…';
+    const { error } = await sb.auth.signInWithPassword({ email: f.get('email'), password: f.get('password') });
+    if (error) renderAdminLogin('דוא״ל או סיסמה שגויים'); else renderAdminDashboard();
+  });
+}
+async function fetchEvents(days) {
+  const since = new Date(Date.now() - days * 864e5).toISOString();
+  const rows = [];
+  for (let from = 0; ; from += 1000) {   // Supabase returns up to 1000 rows per request
+    const { data, error } = await sb.from('tm_analytics_events')
+      .select('created_at,event_type,page,product,session_id,device_type,metadata')
+      .gte('created_at', since).order('created_at', { ascending: true }).range(from, from + 999);
+    if (error) throw error;
+    rows.push(...data);
+    if (data.length < 1000 || rows.length >= 100000) break;
+  }
+  return rows;
+}
+const PAGE_NAMES = { '/': 'דף הבית', '/reps': 'מידע לנציגים', '/accessibility': 'הצהרת נגישות', '/terms': 'תקנון', '/privacy': 'מדיניות פרטיות' };
+const barRow = (label, n, max, color = 'bg-blue-500', extra = '', labelW = 'w-40 sm:w-56') => `
+  <div class="flex items-center gap-3 text-sm">
+    <span class="${labelW} shrink-0 truncate text-neutral-700">${label}</span>
+    <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-neutral-100"><div class="h-full rounded-full ${color}" style="width:${max && n ? Math.max(2, n / max * 100) : 0}%"></div></div>
+    <span class="min-w-[2.5rem] shrink-0 whitespace-nowrap text-left font-semibold tabular-nums text-neutral-900">${n.toLocaleString('he-IL')}${extra}</span>
+  </div>`;
+
+async function renderAdminDashboard() {
+  const box = document.getElementById('adminBody');
+  if (!box) return;
+  box.innerHTML = '<p class="text-neutral-500">טוען נתונים…</p>';
+  let rows;
+  try { rows = await fetchEvents(adminDays); }
+  catch { box.innerHTML = '<p class="text-red-600">לא ניתן לטעון נתונים. ייתכן שהמשתמש הזה לא מורשה לצפות באנליטיקה.</p>'; return; }
+
+  const sessions = new Set(rows.map(r => r.session_id));
+  const views = rows.filter(r => r.event_type === 'page_view' || r.event_type === 'product_view');
+  const productViews = rows.filter(r => r.event_type === 'product_view');
+  const sheetViews = rows.filter(r => r.event_type === 'sheet_view');
+
+  // Visitors per day
+  const dayKey = d => d.toLocaleDateString('en-CA');
+  const days = [];
+  for (let i = adminDays - 1; i >= 0; i--) days.push(dayKey(new Date(Date.now() - i * 864e5)));
+  const perDay = Object.fromEntries(days.map(d => [d, new Set()]));
+  rows.forEach(r => { const k = dayKey(new Date(r.created_at)); if (perDay[k]) perDay[k].add(r.session_id); });
+  const dayCounts = days.map(d => perDay[d].size), dayMax = Math.max(1, ...dayCounts);
+  const chart = `
+    <div class="flex h-40 items-end gap-[2px]" dir="ltr">
+      ${days.map((d, i) => `<div class="group relative flex-1 rounded-t bg-blue-500/80 hover:bg-blue-600" style="height:${Math.max(dayCounts[i] ? 4 : 1, dayCounts[i] / dayMax * 100)}%" title="${d.split('-').reverse().join('.')}: ${dayCounts[i]} מבקרים"></div>`).join('')}
+    </div>
+    <div class="mt-1 flex justify-between text-xs text-neutral-400" dir="ltr"><span>${days[0].split('-').reverse().slice(0, 2).join('.')}</span><span>${days.at(-1).split('-').reverse().slice(0, 2).join('.')}</span></div>`;
+
+  // Products
+  const prodStats = items.map(it => {
+    const pv = productViews.filter(r => r.product === it.slug);
+    const dw = rows.filter(r => r.event_type === 'dwell_time' && r.product === it.slug).map(r => +(r.metadata || {}).duration_seconds || 0);
+    return { slug: it.slug, parts: it.parts, title: it.title, opens: pv.length, people: new Set(pv.map(r => r.session_id)).size, sheets: sheetViews.filter(r => r.product === it.slug).length,
+      dwell: dw.length ? Math.round(dw.reduce((a, b) => a + b, 0) / dw.length) : null };
+  }).sort((a, b) => b.opens - a.opens);
+  const fmtDur = s => s == null ? '—' : s < 60 ? `${s} שנ׳` : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} דק׳`;
+
+  // Scroll depth (like Kia): how many got to 25/50/75/100% of a page
+  const scrollRows = rows.filter(r => r.event_type === 'scroll_depth');
+  const depthCount = d => scrollRows.filter(r => +(r.metadata || {}).depth === d).length;
+  const depth25 = depthCount(25) || 1;
+  const scrollCard = [25, 50, 75, 100].map(d => barRow(`${d}%`, depthCount(d), depth25, 'bg-blue-500', '', 'w-12')).join('') +
+    '<p class="pt-1 text-xs text-neutral-400">כמה מגלגלים עד הסוף? (דף הבית וחלונות המוצרים)</p>';
+  const prodMax = Math.max(0, ...prodStats.map(p => p.opens));
+  const prodTable = `
+    <div class="overflow-x-auto"><table class="w-full text-sm">
+      <thead><tr class="border-b border-neutral-200 text-right text-neutral-500"><th class="py-2 font-medium">מוצר</th><th class="py-2 font-medium">פתיחות</th><th class="py-2 font-medium">מבקרים</th><th class="py-2 font-medium">דף מוצר</th><th class="py-2 font-medium">זמן צפייה ממוצע</th><th class="hidden w-1/4 py-2 sm:table-cell"></th></tr></thead>
+      <tbody>${prodStats.map(p => `<tr class="border-b border-neutral-100">
+        <td class="py-2.5 font-medium text-neutral-900">${esc(p.title)}</td><td class="tabular-nums">${p.opens}</td><td class="tabular-nums">${p.people}</td><td class="tabular-nums">${p.sheets}</td><td class="whitespace-nowrap tabular-nums">${fmtDur(p.dwell)}</td>
+        <td class="hidden py-2.5 sm:table-cell"><div class="h-2 overflow-hidden rounded-full bg-neutral-100"><div class="h-full rounded-full bg-emerald-500" style="width:${prodMax ? p.opens / prodMax * 100 : 0}%"></div></div></td></tr>
+        ${(p.parts || []).map(part => {
+          // Kit items: each part has its own product sheet, counted separately
+          const file = part.sheet.split('/').pop();
+          const n = sheetViews.filter(r => (r.metadata || {}).sheet === file).length;
+          return `<tr class="border-b border-neutral-100 bg-neutral-50/60 text-neutral-600">
+            <td class="py-2 pr-5 text-[13px]">↳ ${esc(part.name)}</td><td class="text-neutral-300">—</td><td class="text-neutral-300">—</td><td class="tabular-nums">${n}</td><td class="text-neutral-300">—</td><td class="hidden sm:table-cell"></td></tr>`;
+        }).join('')}`).join('')}</tbody>
+    </table></div>`;
+
+  // Devices (by visitor)
+  const devBySession = {};
+  rows.forEach(r => { devBySession[r.session_id] = r.device_type; });
+  const devCount = { mobile: 0, tablet: 0, desktop: 0 };
+  Object.values(devBySession).forEach(d => { if (d in devCount) devCount[d]++; });
+  const devTotal = Object.values(devCount).reduce((a, b) => a + b, 0);
+  const devices = [['נייד', 'mobile', 'bg-blue-500'], ['טאבלט', 'tablet', 'bg-green-500'], ['מחשב', 'desktop', 'bg-purple-500']]
+    .map(([l, k, c]) => barRow(l, devCount[k], devTotal, c, devTotal ? ` <span class="font-normal text-neutral-400">(${Math.round(devCount[k] / devTotal * 100)}%)</span>` : '', 'w-14')).join('');
+
+  // Peak hours
+  const hours = Array(24).fill(0);
+  views.forEach(r => hours[new Date(r.created_at).getHours()]++);
+  const hMax = Math.max(1, ...hours);
+  const peak = `
+    <div class="flex h-28 items-end gap-[2px]" dir="ltr">${hours.map((n, h) => `<div class="flex-1 rounded-t bg-amber-400" style="height:${Math.max(n ? 4 : 1, n / hMax * 100)}%" title="${String(h).padStart(2, '0')}:00 — ${n} צפיות"></div>`).join('')}</div>
+    <div class="mt-1 flex justify-between text-xs text-neutral-400" dir="ltr"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>`;
+
+  // Pages
+  const pageCount = {};
+  rows.filter(r => r.event_type === 'page_view').forEach(r => { pageCount[r.page] = (pageCount[r.page] || 0) + 1; });
+  const pageList = Object.entries(pageCount).sort((a, b) => b[1] - a[1]);
+  const pMax = pageList.length ? pageList[0][1] : 0;
+  const pages = pageList.length ? pageList.map(([p, n]) => barRow(esc(PAGE_NAMES[p] || p), n, pMax, 'bg-neutral-700')).join('') : '<p class="text-sm text-neutral-400">אין עדיין נתונים</p>';
+
+  const kpi = (label, n) => `<div class="rounded-2xl border border-neutral-200 bg-white p-4"><div class="text-sm text-neutral-500">${label}</div><div class="mt-1 text-3xl font-black tabular-nums text-neutral-900">${n.toLocaleString('he-IL')}</div></div>`;
+  const { data: { session } } = await sb.auth.getSession();
+  box.innerHTML = `
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div><h1 class="text-2xl font-bold text-neutral-900">אנליטיקה</h1><p class="text-sm text-neutral-500">רק מבקרים שאישרו עוגיות סטטיסטיקה נספרים</p></div>
+      <div class="flex flex-wrap items-center gap-2">
+        ${[7, 14, 30, 90].map(d => `<button data-days="${d}" class="rounded-full px-3.5 py-1.5 text-sm font-medium ${d === adminDays ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'}">${d} ימים</button>`).join('')}
+        <button id="adminPassword" class="rounded-full border border-neutral-300 px-3.5 py-1.5 text-sm text-neutral-600 hover:bg-neutral-50">שינוי סיסמה</button>
+        <button id="adminLogout" class="rounded-full border border-neutral-300 px-3.5 py-1.5 text-sm text-neutral-600 hover:bg-neutral-50" title="${esc(session?.user?.email)}">יציאה</button>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      ${kpi('מבקרים', sessions.size)}${kpi('צפיות', views.length)}${kpi('פתיחות מוצר', productViews.length)}${kpi('צפיות בדף מוצר', sheetViews.length)}
+    </div>
+    <div class="mt-4 grid gap-4">
+      ${adminCard('מבקרים לפי יום', chart)}
+      ${adminCard('המוצרים', prodTable)}
+      <div class="grid gap-4 lg:grid-cols-3">
+        ${adminCard('התפלגות מכשירים', `<div class="space-y-3">${devices}</div>`)}
+        ${adminCard('עומק גלילה', `<div class="space-y-3">${scrollCard}</div>`)}
+        ${adminCard('שעות שיא', peak)}
+      </div>
+      ${adminCard('עמודים', `<div class="space-y-3">${pages}</div>`)}
+    </div>`;
+  box.querySelectorAll('[data-days]').forEach(b => b.addEventListener('click', () => { adminDays = +b.dataset.days; renderAdminDashboard(); }));
+  document.getElementById('adminLogout').addEventListener('click', async () => { await sb.auth.signOut(); renderAdminLogin(); });
+  document.getElementById('adminPassword').addEventListener('click', openPasswordDialog);
+}
+
+// Change the signed-in user's own password
+function openPasswordDialog() {
+  const wrap = document.createElement('div');
+  wrap.className = 'fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4';
+  wrap.innerHTML = `
+    <form class="w-full max-w-sm space-y-4 rounded-2xl bg-white p-6 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+      <div class="flex items-center justify-between"><h2 id="pwTitle" class="text-xl font-bold text-neutral-900">שינוי סיסמה</h2>
+        <button type="button" data-pw="close" aria-label="סגירה" class="rounded-full p-1 text-xl leading-none text-neutral-400 hover:bg-neutral-100">✕</button></div>
+      <label class="block text-sm font-medium text-neutral-700">סיסמה חדשה
+        <input name="p1" type="password" required minlength="6" autocomplete="new-password" dir="ltr" class="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-base focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></label>
+      <label class="block text-sm font-medium text-neutral-700">שוב את הסיסמה החדשה
+        <input name="p2" type="password" required minlength="6" autocomplete="new-password" dir="ltr" class="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-base focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></label>
+      <p class="text-xs text-neutral-500">לפחות 6 תווים.</p>
+      <p data-pw="msg" class="hidden text-sm"></p>
+      <button class="w-full rounded-lg bg-blue-600 py-2.5 font-semibold text-white hover:bg-blue-700">שמירה</button>
+    </form>`;
+  document.body.appendChild(wrap);
+  const form = wrap.querySelector('form'), msg = wrap.querySelector('[data-pw="msg"]');
+  const say = (t, ok) => { msg.textContent = t; msg.className = 'text-sm ' + (ok ? 'text-emerald-600' : 'text-red-600'); };
+  wrap.addEventListener('click', e => { if (e.target === wrap || e.target.closest('[data-pw="close"]')) wrap.remove(); });
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const p1 = form.p1.value, p2 = form.p2.value;
+    if (p1 !== p2) return say('הסיסמאות לא זהות', false);
+    form.querySelector('button:last-child').disabled = true;
+    const { error } = await sb.auth.updateUser({ password: p1 });
+    form.querySelector('button:last-child').disabled = false;
+    if (error) return say(/different|same/i.test(error.message) ? 'הסיסמה החדשה זהה לישנה' : /weak|short|least/i.test(error.message) ? 'הסיסמה חלשה מדי' : 'השינוי לא הצליח. נסו שוב.', false);
+    form.p1.value = form.p2.value = '';
+    say('הסיסמה עודכנה ✓', true);
+    setTimeout(() => wrap.remove(), 1500);
+  });
+  form.p1.focus();
+}
+
+function route() {
+  const h = location.hash.slice(1);
+  trackPage();
+  closeMenu();
+  const app = document.getElementById('app');
+  const onHome = !!app.querySelector('#products');
+  if (h.startsWith('p-') && items.some(x => x.slug === h.slice(2))) {
+    if (!onHome) { app.innerHTML = renderHome(); window.scrollTo(0, 0); }
+    openItem(h.slice(2));
+    return;
+  }
+  closeItem();
+  if (h === 'reps') { app.innerHTML = renderReps(); window.scrollTo(0, 0); return; }
+  if (LEGAL[h]) { app.innerHTML = LEGAL[h](); window.scrollTo(0, 0); return; }
+  if (h === 'admin') { app.innerHTML = renderAdmin(); window.scrollTo(0, 0); return; }
+  if (!onHome) { app.innerHTML = renderHome(); window.scrollTo(0, 0); }
+}
+window.addEventListener('hashchange', route);
+route();
+</script>
+
+</body>
+</html>
